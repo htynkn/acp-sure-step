@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "git-auto-commit-push": {
+      "source": "giikin/skills",
+      "sourceType": "github",
+      "computedHash": "c40abffae6b7ef9f18e2158d4daf75e437079bfe9cd05fa0cb3a782d6fd7e8fc"
+    }
+  }
+}
