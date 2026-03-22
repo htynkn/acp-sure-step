@@ -1,4 +1,6 @@
 package com.huangyunkun.node;
 
-public class BaseNodeComponent {
+import com.yomahub.liteflow.core.NodeComponent;
+
+public abstract class BaseNodeComponent extends NodeComponent {
 }
