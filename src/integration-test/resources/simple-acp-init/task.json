@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "acpInit",
+      "type": "acpInit",
+      "command": "qwen",
+      "args": [
+        "--acp"
+      ]
+    },
+    {
+      "id": "cal",
+      "type": "acpExec",
+      "prompt": "prompt.md"
+    }
+  ]
+}
