@@ -1,4 +1,6 @@
 package com.huangyunkun.config.dto;
 
-public class TaskEnum {
+public enum TaskEnum {
+    acpInit,
+    acpExec
 }

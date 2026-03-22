@@ -1,8 +1,12 @@
 {
-  "tasks" : [
+  "tasks": [
     {
       "id": "acpInit",
-      "type": "acpInit"
+      "type": "acpInit",
+      "command": "qwen",
+      "args": [
+        "--acp"
+      ]
     }
   ]
 }
