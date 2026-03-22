@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public abstract class BaseNodeComponent extends NodeComponent {
     BaseTaskConfig getCurrentTaskConfig() {
-        ConfigService configService = ApplicationAwareUtil.getBean();
+        ConfigService configService = ApplicationAwareUtil.getBean(ConfigService.class);
         List<BaseTaskConfig> taskConfigs = configService.getTaskConfigs();
         String nodeId = this.getNodeId();
         Optional<BaseTaskConfig> first = taskConfigs.stream().filter(p -> Strings.CS.equals(nodeId, p.getId())).findFirst();

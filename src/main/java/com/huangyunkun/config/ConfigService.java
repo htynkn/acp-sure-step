@@ -8,14 +8,21 @@ import com.yomahub.liteflow.builder.LiteFlowNodeBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 public class ConfigService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private List<BaseTaskConfig> taskConfigs;
+    private Path taskBaseDir;
+
+    public Path getTaskBaseDir() {
+        return taskBaseDir;
+    }
 
     public List<BaseTaskConfig> loadTask(String taskConfigFilePath) throws IOException {
+        this.taskBaseDir = new File(taskConfigFilePath).toPath().getParent();
         Map<String, Object> configMap = objectMapper.readValue(new File(taskConfigFilePath), new TypeReference<Map<String, Object>>() {
         });
         Object tasksObj = configMap.get("tasks");

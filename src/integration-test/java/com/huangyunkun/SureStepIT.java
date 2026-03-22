@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-class SureStepTest {
+class SureStepIT {
     @Test
     void shouldEnableRunAcp() throws Exception {
         SureStep sureStep = new SureStep();

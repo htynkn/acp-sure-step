@@ -4,6 +4,7 @@ import com.google.common.io.Resources;
 import com.huangyunkun.config.dto.AcpExecTaskConfig;
 import com.huangyunkun.config.dto.AcpInitTaskConfig;
 import com.huangyunkun.config.dto.BaseTaskConfig;
+import com.huangyunkun.config.dto.TaskEnum;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ class ConfigServiceTest {
         AcpInitTaskConfig acpInitTaskConfig = (AcpInitTaskConfig) taskConfig1;
         assertThat(acpInitTaskConfig.getCommand(), is("qwen"));
         assertThat(acpInitTaskConfig.getArgs(), hasSize(1));
+        assertThat(acpInitTaskConfig.getType(), is(TaskEnum.acpInit));
 
         BaseTaskConfig taskConfig2 = taskConfigs.get(1);
         assertThat(taskConfig2, instanceOf(AcpExecTaskConfig.class));
