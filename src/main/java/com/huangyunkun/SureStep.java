@@ -7,6 +7,8 @@ import com.yomahub.liteflow.core.FlowExecutorHolder;
 import com.yomahub.liteflow.flow.LiteflowResponse;
 import com.yomahub.liteflow.property.LiteflowConfig;
 
+import java.io.IOException;
+
 public class SureStep {
     private ConfigService configService;
     private FlowExecutor flowExecutor;
@@ -20,7 +22,7 @@ public class SureStep {
         return new SureStep();
     }
 
-    public void intWithTaskAndFlowConfigFile(String taskFilePath, String flowFilePath) {
+    public void intWithTaskAndFlowConfigFile(String taskFilePath, String flowFilePath) throws IOException {
         configService.loadTask(taskFilePath);
 
         LiteflowConfig config = new LiteflowConfig();

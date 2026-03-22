@@ -6,6 +6,7 @@ import com.huangyunkun.config.dto.AcpInitTaskConfig;
 import com.huangyunkun.config.dto.BaseTaskConfig;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -16,7 +17,7 @@ import static org.hamcrest.Matchers.instanceOf;
 
 class ConfigServiceTest {
     @Test
-    void shouldEnableLoadTask() {
+    void shouldEnableLoadTask() throws Exception {
         ConfigService configService = new ConfigService();
 
         List<BaseTaskConfig> taskConfigs = configService.loadTask(Resources.getResource("config/simple-acp-init/task.json").getFile());
