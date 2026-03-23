@@ -1,4 +1,4 @@
-package com.huangyunkun.acp;
+package com.huangyunkun.acpsure.core.acp;
 
 import com.agentclientprotocol.sdk.client.AcpClient;
 import com.agentclientprotocol.sdk.client.AcpSyncClient;

@@ -1,4 +1,4 @@
-package com.huangyunkun.config.dto;
+package com.huangyunkun.acpsure.core.config.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

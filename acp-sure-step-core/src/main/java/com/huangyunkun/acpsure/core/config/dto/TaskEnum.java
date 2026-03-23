@@ -1,4 +1,4 @@
-package com.huangyunkun.config.dto;
+package com.huangyunkun.acpsure.core.config.dto;
 
 public enum TaskEnum {
     acpInit,

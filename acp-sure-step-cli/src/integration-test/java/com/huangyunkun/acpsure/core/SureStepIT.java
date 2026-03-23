@@ -1,10 +1,10 @@
-package com.huangyunkun;
+package com.huangyunkun.acpsure.core;
 
 import com.google.common.io.Resources;
+import com.huangyunkun.acpsure.cli.SureStepCliApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.huangyunkun.cli.SureStepCliApplication;
 
 @SpringBootTest(classes = SureStepCliApplication.class)
 class SureStepIT {

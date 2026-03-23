@@ -1,9 +1,9 @@
-package com.huangyunkun.config;
+package com.huangyunkun.acpsure.core.config;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.huangyunkun.config.dto.BaseTaskConfig;
-import com.huangyunkun.config.dto.TaskEnum;
+import com.huangyunkun.acpsure.core.config.dto.BaseTaskConfig;
+import com.huangyunkun.acpsure.core.config.dto.TaskEnum;
 import com.yomahub.liteflow.builder.LiteFlowNodeBuilder;
 import org.springframework.stereotype.Component;
 
@@ -39,12 +39,12 @@ public class ConfigService {
             if (taskConfig.getType() == TaskEnum.acpInit) {
                 LiteFlowNodeBuilder.createCommonNode().setId(taskConfig.getId())
                         .setName(taskConfig.getId())
-                        .setClazz("com.huangyunkun.node.AcpInitNode")
+                        .setClazz("com.huangyunkun.acpsure.core.node.AcpInitNode")
                         .build();
             } else if (taskConfig.getType() == TaskEnum.acpExec) {
                 LiteFlowNodeBuilder.createCommonNode().setId(taskConfig.getId())
                         .setName(taskConfig.getId())
-                        .setClazz("com.huangyunkun.node.AcpExecNode")
+                        .setClazz("com.huangyunkun.acpsure.core.node.AcpExecNode")
                         .build();
             }
         }

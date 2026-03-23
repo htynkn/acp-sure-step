@@ -1,4 +1,4 @@
-package com.huangyunkun.util;
+package com.huangyunkun.acpsure.core.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

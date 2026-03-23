@@ -1,9 +1,9 @@
-package com.huangyunkun.node;
+package com.huangyunkun.acpsure.core.node;
 
 import com.google.common.base.Preconditions;
-import com.huangyunkun.config.ConfigService;
-import com.huangyunkun.config.dto.BaseTaskConfig;
-import com.huangyunkun.util.ApplicationAwareUtil;
+import com.huangyunkun.acpsure.core.config.dto.BaseTaskConfig;
+import com.huangyunkun.acpsure.core.config.ConfigService;
+import com.huangyunkun.acpsure.core.util.ApplicationAwareUtil;
 import com.yomahub.liteflow.core.NodeComponent;
 import org.apache.commons.lang3.StringUtils;
 

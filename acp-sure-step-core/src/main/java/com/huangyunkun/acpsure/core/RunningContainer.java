@@ -1,6 +1,6 @@
-package com.huangyunkun;
+package com.huangyunkun.acpsure.core;
 
-import com.huangyunkun.config.dto.BaseTaskConfig;
+import com.huangyunkun.acpsure.core.config.dto.BaseTaskConfig;
 import lombok.Data;
 
 import java.util.List;
