@@ -1,5 +1,8 @@
 # ACP Sure Step
 
+![GitHub License](https://img.shields.io/github/license/htynkn/acp-sure-step)
+![GitHub branch check runs](https://img.shields.io/github/check-runs/htynkn/acp-sure-step/master)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/htynkn/acp-sure-step)
 [![](https://jitpack.io/v/htynkn/acp-sure-step.svg)](https://jitpack.io/#htynkn/acp-sure-step)
 
 ## Project Overview
