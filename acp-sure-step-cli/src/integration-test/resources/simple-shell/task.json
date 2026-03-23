@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "acpInit",
+      "type": "acpInit",
+      "command": "qwen",
+      "args": [
+        "--acp"
+      ]
+    },
+    {
+      "id": "getInfo",
+      "type": "bashExec",
+      "bash": "echo hello > output.txt"
+    }
+  ]
+}

@@ -6,12 +6,28 @@
     <groupId>com.huangyunkun</groupId>
     <artifactId>acp-sure-step</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>acp-sure-step</name>
+
+    <modules>
+        <module>acp-sure-step-core</module>
+        <module>acp-sure-step-cli</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <spring-boot.version>3.4.4</spring-boot.version>
+        <liteflow.version>2.15.3</liteflow.version>
+        <acp-core.version>0.9.0-SNAPSHOT</acp-core.version>
+        <jackson.version>2.15.2</jackson.version>
+        <guava.version>33.3.0-jre</guava.version>
+        <lombok.version>1.18.30</lombok.version>
+        <hamcrest.version>3.0</hamcrest.version>
+        <logback.version>1.4.14</logback.version>
+        <picocli.version>4.7.6</picocli.version>
+        <zt-exec.version>1.12</zt-exec.version>
     </properties>
 
     <repositories>
@@ -30,68 +46,64 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.11.0</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.huangyunkun</groupId>
+                <artifactId>acp-sure-step-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>liteflow-core</artifactId>
+                <version>${liteflow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.agentclientprotocol</groupId>
+                <artifactId>acp-core</artifactId>
+                <version>${acp-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>${hamcrest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli-spring-boot-starter</artifactId>
+                <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-exec</artifactId>
+                <version>${zt-exec.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.yomahub</groupId>
-            <artifactId>liteflow-core</artifactId>
-            <version>2.15.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.agentclientprotocol</groupId>
-            <artifactId>acp-core</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.3.0-jre</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.13</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
-        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+        <pluginManagement>
             <plugins>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
@@ -131,73 +143,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <id>add-integration-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/integration-test/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-integration-test-resource</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>add-test-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/integration-test/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.1.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <include>**/*IT.java</include>
-                        <include>**/*IntegrationTest.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 </project>
