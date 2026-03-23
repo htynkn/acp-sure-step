@@ -1,5 +1,7 @@
 # ACP Sure Step
 
+[![](https://jitpack.io/v/htynkn/acp-sure-step.svg)](https://jitpack.io/#htynkn/acp-sure-step)
+
 ## Project Overview
 
 **ACP Sure Step** is a Java-based CLI tool that executes task flows using ACP (Agent Client Protocol) agents. It provides a workflow engine powered by LiteFlow, allowing users to define and execute complex task sequences that can interact with AI agents and execute shell commands.
