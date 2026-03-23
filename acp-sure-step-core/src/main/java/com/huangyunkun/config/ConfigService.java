@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huangyunkun.config.dto.BaseTaskConfig;
 import com.huangyunkun.config.dto.TaskEnum;
 import com.yomahub.liteflow.builder.LiteFlowNodeBuilder;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class ConfigService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private List<BaseTaskConfig> taskConfigs;
