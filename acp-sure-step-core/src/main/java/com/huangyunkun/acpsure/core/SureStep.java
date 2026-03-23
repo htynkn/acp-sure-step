@@ -19,6 +19,8 @@ public class SureStep {
     }
 
     public void intWithTaskAndFlowConfigFile(String taskFilePath, String flowFilePath) throws IOException {
+        FlowExecutorHolder.clean();
+
         configService.loadTask(taskFilePath);
 
         LiteflowConfig config = new LiteflowConfig();
