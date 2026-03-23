@@ -17,7 +17,7 @@ public class AcpInitNode extends BaseNodeComponent {
 
         ApplicationAwareUtil.regBean(acpService);
 
-        String tmp = "/tmp";
+        String tmp = "/home/htynkn/Opensource/acp-sure-step";
 
         acpService.init(taskConfig.getCommand(), taskConfig.getArgs(), taskConfig.getEnv(), tmp);
     }
