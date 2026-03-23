@@ -46,6 +46,11 @@ public class ConfigService {
                         .setName(taskConfig.getId())
                         .setClazz("com.huangyunkun.acpsure.core.node.AcpExecNode")
                         .build();
+            } else if (taskConfig.getType() == TaskEnum.bashExec) {
+                LiteFlowNodeBuilder.createCommonNode().setId(taskConfig.getId())
+                        .setName(taskConfig.getId())
+                        .setClazz("com.huangyunkun.acpsure.core.node.BashExecNode")
+                        .build();
             }
         }
 

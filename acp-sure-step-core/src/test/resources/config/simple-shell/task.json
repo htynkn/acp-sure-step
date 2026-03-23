@@ -9,7 +9,12 @@
       ]
     },
     {
-      "id": "cal",
+      "id": "getIp",
+      "type": "bashExec",
+      "bash": "wget https://ipinfo.io/ip -qO- >> ip.txt"
+    },
+    {
+      "id": "summary",
       "type": "acpExec",
       "prompt": "prompt.md"
     }

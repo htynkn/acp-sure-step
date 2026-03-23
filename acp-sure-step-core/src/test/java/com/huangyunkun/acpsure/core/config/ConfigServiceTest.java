@@ -4,6 +4,7 @@ import com.google.common.io.Resources;
 import com.huangyunkun.acpsure.core.config.dto.AcpExecTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.AcpInitTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.BaseTaskConfig;
+import com.huangyunkun.acpsure.core.config.dto.BashExecTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.TaskEnum;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -36,5 +37,29 @@ class ConfigServiceTest {
         assertThat(taskConfig2, instanceOf(AcpExecTaskConfig.class));
         AcpExecTaskConfig acpExecTaskConfig = (AcpExecTaskConfig) taskConfig2;
         assertThat(acpExecTaskConfig.getId(), is("cal"));
+    }
+
+    @Test
+    void shouldEnableLoadSimpleShellTask() throws Exception {
+        ConfigService configService = new ConfigService();
+
+        List<BaseTaskConfig> taskConfigs = configService.loadTask(Resources.getResource("config/simple-shell/task.json").getFile());
+
+        assertThat(taskConfigs, hasSize(3));
+
+        BaseTaskConfig taskConfig1 = taskConfigs.get(0);
+        assertThat(taskConfig1, instanceOf(AcpInitTaskConfig.class));
+        assertThat(taskConfig1.getType(), CoreMatchers.is(TaskEnum.acpInit));
+
+        BaseTaskConfig taskConfig2 = taskConfigs.get(1);
+        assertThat(taskConfig2, instanceOf(BashExecTaskConfig.class));
+        BashExecTaskConfig bashExecTaskConfig = (BashExecTaskConfig) taskConfig2;
+        assertThat(bashExecTaskConfig.getId(), is("getIp"));
+        assertThat(bashExecTaskConfig.getType(), CoreMatchers.is(TaskEnum.bashExec));
+        assertThat(bashExecTaskConfig.getBash(), is("wget https://ipinfo.io/ip -qO- >> ip.txt"));
+
+        BaseTaskConfig taskConfig3 = taskConfigs.get(2);
+        assertThat(taskConfig3, instanceOf(AcpExecTaskConfig.class));
+        assertThat(taskConfig3.getId(), is("summary"));
     }
 }

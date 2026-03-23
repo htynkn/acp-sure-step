@@ -27,6 +27,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <logback.version>1.4.14</logback.version>
         <picocli.version>4.7.6</picocli.version>
+        <zt-exec.version>1.12</zt-exec.version>
     </properties>
 
     <repositories>
@@ -92,6 +93,11 @@
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli-spring-boot-starter</artifactId>
                 <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-exec</artifactId>
+                <version>${zt-exec.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
