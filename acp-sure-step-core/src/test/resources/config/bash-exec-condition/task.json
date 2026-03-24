@@ -1,0 +1,20 @@
+{
+  "tasks": [
+    {
+      "id": "checkCondition",
+      "type": "bashExecCondition",
+      "bash": "echo yes",
+      "expectedResult": "yes"
+    },
+    {
+      "id": "onTrue",
+      "type": "bashExec",
+      "bash": "echo true_branch > result.txt"
+    },
+    {
+      "id": "onFalse",
+      "type": "bashExec",
+      "bash": "echo false_branch > result.txt"
+    }
+  ]
+}
