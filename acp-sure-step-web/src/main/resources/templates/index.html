@@ -13,42 +13,50 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             padding: 24px 0;
         }
         .step-card {
-            min-width: 130px;
+            min-width: 140px;
             cursor: pointer;
-            transition: box-shadow 0.2s ease, transform 0.1s ease;
+            transition: box-shadow 0.2s ease, transform 0.15s ease;
             border-radius: 10px;
         }
         .step-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.18); transform: translateY(-2px); }
-        .step-arrow { font-size: 1.5rem; color: #6c757d; line-height: 1; }
-        /* Step state colours */
-        .step-pending  { border-left: 6px solid #6c757d; }
-        .step-running  { border-left: 6px solid #0d6efd; animation: pulse 1.2s infinite; }
+        .step-arrow { font-size: 1.6rem; color: #6c757d; line-height: 1; user-select: none; }
+        .step-pending   { border-left: 6px solid #6c757d; }
+        .step-running   { border-left: 6px solid #0d6efd; animation: pulse 1.2s infinite; }
         .step-completed { border-left: 6px solid #198754; }
-        .step-failed   { border-left: 6px solid #dc3545; }
+        .step-failed    { border-left: 6px solid #dc3545; }
         @keyframes pulse {
             0%   { box-shadow: 0 0 0 0 rgba(13,110,253,.4); }
             70%  { box-shadow: 0 0 0 8px rgba(13,110,253,0); }
             100% { box-shadow: 0 0 0 0 rgba(13,110,253,0); }
         }
-        #logPanel pre { max-height: 400px; overflow-y: auto; font-size: .85rem; }
-        .badge-pending   { background-color: #6c757d; }
-        .badge-running   { background-color: #0d6efd; }
-        .badge-completed { background-color: #198754; }
-        .badge-failed    { background-color: #dc3545; }
+        #logContent { max-height: 420px; overflow-y: auto; font-size: .85rem; }
     </style>
 </head>
 <body>
+
 <nav class="navbar navbar-dark bg-dark mb-4">
     <div class="container-fluid">
         <span class="navbar-brand fw-bold">⚙ ACP Sure Step – Web UI</span>
     </div>
 </nav>
 
-<div class="container">
+<div id="app" class="container">
+
+    <!-- Toast notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999">
+        <div v-if="toast.show" class="toast show align-items-center"
+             :class="'text-bg-' + toast.type" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">{{ toast.message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        @click="toast.show = false"></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Configuration form -->
     <div class="card shadow-sm mb-4">
@@ -56,40 +64,65 @@
         <div class="card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-md-5">
-                    <label for="taskFile" class="form-label">Task file (task.json)</label>
-                    <input type="text" id="taskFile" class="form-control" placeholder="/path/to/task.json">
+                    <label class="form-label">Task file (task.json)</label>
+                    <input v-model="taskFile" type="text" class="form-control" placeholder="/path/to/task.json">
                 </div>
                 <div class="col-md-5">
-                    <label for="flowFile" class="form-label">Flow file (config.xml)</label>
-                    <input type="text" id="flowFile" class="form-control" placeholder="/path/to/config.xml">
+                    <label class="form-label">Flow file (config.xml)</label>
+                    <input v-model="flowFile" type="text" class="form-control" placeholder="/path/to/config.xml">
                 </div>
-                <div class="col-md-2 d-flex gap-2">
-                    <button class="btn btn-primary w-100" onclick="loadFlow()">Load</button>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" :disabled="loadBusy" @click="loadFlow">
+                        <span v-if="loadBusy" class="spinner-border spinner-border-sm me-1"></span>
+                        Load
+                    </button>
                 </div>
             </div>
-            <div id="loadError" class="alert alert-danger mt-3 d-none"></div>
+            <div v-if="loadError" class="alert alert-danger mt-3 mb-0">{{ loadError }}</div>
         </div>
     </div>
 
     <!-- Flow visualization -->
-    <div class="card shadow-sm mb-4" id="flowSection" style="display:none!important">
+    <div v-if="flowLoaded" class="card shadow-sm mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-semibold">Flow Chain</span>
-            <button class="btn btn-success btn-sm" id="startBtn" onclick="startFlow()">▶ Start Flow</button>
+            <button class="btn btn-success btn-sm" :disabled="status.running" @click="startFlow">
+                <span v-if="status.running" class="spinner-border spinner-border-sm me-1"></span>
+                ▶ Start Flow
+            </button>
         </div>
         <div class="card-body">
-            <div id="statusBanner" class="alert d-none"></div>
-            <div class="flow-container" id="flowContainer"></div>
+
+            <!-- Status banner -->
+            <div v-if="status.running"   class="alert alert-info  mb-3">⏳ Flow is running…</div>
+            <div v-if="status.completed" class="alert alert-success mb-3">✅ Flow completed successfully.</div>
+            <div v-if="status.failed"    class="alert alert-danger mb-3">❌ Flow failed: {{ status.errorMessage }}</div>
+
+            <!-- Step cards -->
+            <div class="flow-container">
+                <template v-for="(step, idx) in status.steps" :key="step.id">
+                    <span v-if="idx > 0" class="step-arrow">→</span>
+                    <div class="card step-card p-2 text-center"
+                         :class="'step-' + step.state.toLowerCase()"
+                         :title="'Click to view logs for ' + step.id"
+                         @click="showLogs(step)">
+                        <div class="fw-bold small mb-1">{{ step.id }}</div>
+                        <span class="badge text-white" :class="badgeClass(step.state)">{{ step.state }}</span>
+                        <div v-if="step.errorMessage" class="text-danger small mt-1">{{ step.errorMessage }}</div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 
     <!-- Log panel -->
-    <div class="card shadow-sm mb-4" id="logSection" style="display:none!important">
-        <div class="card-header fw-semibold">
-            Logs for step: <span id="logStepId" class="badge bg-secondary"></span>
+    <div v-if="selectedStep" class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+            <span>Logs for step: <span class="badge bg-secondary">{{ selectedStep }}</span></span>
+            <button type="button" class="btn-close" @click="selectedStep = null"></button>
         </div>
-        <div class="card-body" id="logPanel">
-            <pre id="logContent" class="bg-dark text-light rounded p-3">No logs yet.</pre>
+        <div class="card-body p-0">
+            <pre id="logContent" class="bg-dark text-light rounded p-3 mb-0">{{ logContent }}</pre>
         </div>
     </div>
 
@@ -98,156 +131,121 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmA/jcxg4nVMp0bYVFnp9KqXdkb0"
         crossorigin="anonymous"></script>
+<script src="/js/vue.global.prod.js"></script>
 <script>
-    let pollInterval = null;
+const { createApp } = Vue;
 
-    function loadFlow() {
-        const taskFile = document.getElementById('taskFile').value.trim();
-        const flowFile = document.getElementById('flowFile').value.trim();
-        if (!taskFile || !flowFile) {
-            showLoadError('Please enter both file paths.');
-            return;
+createApp({
+    data() {
+        return {
+            taskFile: '',
+            flowFile: '',
+            loadBusy: false,
+            loadError: null,
+            flowLoaded: false,
+            status: { loaded: false, running: false, completed: false, failed: false, errorMessage: null, steps: [] },
+            selectedStep: null,
+            logLines: [],
+            logError: null,
+            pollTimer: null,
+            pollFailures: 0,
+            toast: { show: false, type: 'danger', message: '' }
+        };
+    },
+    computed: {
+        logContent() {
+            if (this.logError) return this.logError;
+            return this.logLines.length ? this.logLines.join('\n') : '(no logs captured for this step)';
         }
-
-        const body = new URLSearchParams({ taskFile, flowFile });
-        fetch('/api/flow/load', { method: 'POST', body })
-            .then(r => r.json())
-            .then(status => {
-                if (!status.loaded) {
-                    showLoadError(status.errorMessage || 'Failed to load flow.');
-                    return;
-                }
-                hideLoadError();
-                renderFlow(status);
-                document.getElementById('flowSection').style.removeProperty('display');
-                document.getElementById('logSection').style.setProperty('display', 'none', 'important');
-                document.getElementById('startBtn').disabled = false;
-            })
-            .catch(e => showLoadError('Request failed: ' + e.message));
-    }
-
-    function startFlow() {
-        document.getElementById('startBtn').disabled = true;
-        fetch('/api/flow/start', { method: 'POST' })
-            .then(r => r.json())
-            .then(resp => {
-                if (resp.error) {
-                    alert(resp.error);
-                    document.getElementById('startBtn').disabled = false;
-                } else {
-                    startPolling();
-                }
-            })
-            .catch(e => {
-                alert('Failed to start flow: ' + e.message);
-                document.getElementById('startBtn').disabled = false;
-            });
-    }
-
-    function startPolling() {
-        stopPolling();
-        pollInterval = setInterval(pollStatus, 1000);
-    }
-
-    function stopPolling() {
-        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-    }
-
-    function pollStatus() {
-        fetch('/api/flow/status')
-            .then(r => r.json())
-            .then(status => {
-                renderFlow(status);
-                if (!status.running) {
-                    stopPolling();
-                    document.getElementById('startBtn').disabled = false;
-                }
-            });
-    }
-
-    function renderFlow(status) {
-        const container = document.getElementById('flowContainer');
-        container.innerHTML = '';
-
-        const steps = status.steps || [];
-        steps.forEach((step, idx) => {
-            if (idx > 0) {
-                const arrow = document.createElement('span');
-                arrow.className = 'step-arrow';
-                arrow.textContent = '→';
-                container.appendChild(arrow);
+    },
+    methods: {
+        showToast(message, type = 'danger') {
+            this.toast = { show: true, type, message };
+            setTimeout(() => { this.toast.show = false; }, 4000);
+        },
+        async loadFlow() {
+            if (!this.taskFile.trim() || !this.flowFile.trim()) {
+                this.loadError = 'Please enter both file paths.';
+                return;
             }
-            container.appendChild(buildStepCard(step));
-        });
-
-        // Status banner
-        const banner = document.getElementById('statusBanner');
-        if (status.running) {
-            banner.className = 'alert alert-info';
-            banner.textContent = '⏳ Flow is running…';
-            banner.classList.remove('d-none');
-        } else if (status.completed) {
-            banner.className = 'alert alert-success';
-            banner.textContent = '✅ Flow completed successfully.';
-            banner.classList.remove('d-none');
-        } else if (status.failed) {
-            banner.className = 'alert alert-danger';
-            banner.textContent = '❌ Flow failed: ' + (status.errorMessage || '');
-            banner.classList.remove('d-none');
-        } else {
-            banner.classList.add('d-none');
+            this.loadBusy = true;
+            this.loadError = null;
+            try {
+                const body = new URLSearchParams({ taskFile: this.taskFile.trim(), flowFile: this.flowFile.trim() });
+                const resp = await fetch('/api/flow/load', { method: 'POST', body });
+                const data = await resp.json();
+                if (!data.loaded) {
+                    this.loadError = data.errorMessage || 'Failed to load flow.';
+                } else {
+                    this.status = data;
+                    this.flowLoaded = true;
+                    this.selectedStep = null;
+                }
+            } catch (e) {
+                this.loadError = 'Request failed: ' + e.message;
+            } finally {
+                this.loadBusy = false;
+            }
+        },
+        async startFlow() {
+            try {
+                const resp = await fetch('/api/flow/start', { method: 'POST' });
+                const data = await resp.json();
+                if (data.error) {
+                    this.showToast(data.error);
+                } else {
+                    this.pollFailures = 0;
+                    this.startPolling();
+                }
+            } catch (e) {
+                this.showToast('Failed to start flow: ' + e.message);
+            }
+        },
+        startPolling() {
+            this.stopPolling();
+            this.pollTimer = setInterval(this.pollStatus, 1000);
+        },
+        stopPolling() {
+            if (this.pollTimer) { clearInterval(this.pollTimer); this.pollTimer = null; }
+        },
+        async pollStatus() {
+            try {
+                const resp = await fetch('/api/flow/status');
+                if (!resp.ok) throw new Error('Server returned ' + resp.status);
+                const data = await resp.json();
+                this.status = data;
+                this.pollFailures = 0;
+                if (!data.running) this.stopPolling();
+            } catch (e) {
+                this.pollFailures++;
+                if (this.pollFailures >= 3) {
+                    this.stopPolling();
+                    this.showToast('Lost connection while polling flow status.');
+                }
+            }
+        },
+        async showLogs(step) {
+            this.selectedStep = step.id;
+            this.logLines = [];
+            this.logError = null;
+            try {
+                const resp = await fetch('/api/flow/logs/' + encodeURIComponent(step.id));
+                if (!resp.ok) throw new Error('Server returned ' + resp.status);
+                this.logLines = await resp.json();
+            } catch (e) {
+                this.logError = 'Failed to load logs: ' + e.message;
+            }
+        },
+        badgeClass(state) {
+            return {
+                PENDING:   'bg-secondary',
+                RUNNING:   'bg-primary',
+                COMPLETED: 'bg-success',
+                FAILED:    'bg-danger'
+            }[state] || 'bg-secondary';
         }
     }
-
-    function buildStepCard(step) {
-        const state = (step.state || 'PENDING').toLowerCase();
-        const card = document.createElement('div');
-        card.className = `card step-card step-${state} p-2 text-center`;
-        card.onclick = () => showLogs(step.id);
-        card.title = 'Click to see logs';
-
-        const idEl = document.createElement('div');
-        idEl.className = 'fw-bold small mb-1';
-        idEl.textContent = step.id;
-
-        const badge = document.createElement('span');
-        badge.className = `badge badge-${state} text-white`;
-        badge.textContent = step.state || 'PENDING';
-
-        card.appendChild(idEl);
-        card.appendChild(badge);
-
-        if (step.errorMessage) {
-            const err = document.createElement('div');
-            err.className = 'text-danger small mt-1';
-            err.textContent = step.errorMessage;
-            card.appendChild(err);
-        }
-        return card;
-    }
-
-    function showLogs(stepId) {
-        document.getElementById('logStepId').textContent = stepId;
-        document.getElementById('logSection').style.removeProperty('display');
-        document.getElementById('logContent').textContent = 'Loading…';
-
-        fetch('/api/flow/logs/' + encodeURIComponent(stepId))
-            .then(r => r.json())
-            .then(lines => {
-                document.getElementById('logContent').textContent =
-                    lines.length ? lines.join('\n') : '(no logs captured for this step)';
-            });
-    }
-
-    function showLoadError(msg) {
-        const el = document.getElementById('loadError');
-        el.textContent = msg;
-        el.classList.remove('d-none');
-    }
-
-    function hideLoadError() {
-        document.getElementById('loadError').classList.add('d-none');
-    }
+}).mount('#app');
 </script>
 </body>
 </html>
