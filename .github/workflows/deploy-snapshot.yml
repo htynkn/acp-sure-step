@@ -1,4 +1,4 @@
-name: Deploy SNAPSHOT to Maven Central
+name: Deploy SNAPSHOT to GitHub Packages
 
 on:
   push:
@@ -8,9 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: oss
     permissions:
       contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -22,19 +22,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-          server-id: central
-          server-username: OSSRH_USERNAME
-          server-password: OSSRH_TOKEN
-
-      - name: Validate deploy credentials
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
-        run: |
-          if [ -z "$OSSRH_USERNAME" ] || [ -z "$OSSRH_TOKEN" ]; then
-            echo "::error title=Missing Secrets::OSSRH_USERNAME and/or OSSRH_TOKEN are not configured. Add them in Settings > Secrets and variables > Actions. Generate User Tokens at https://central.sonatype.com/account"
-            exit 1
-          fi
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Build and test
         run: mvn -B test --file pom.xml
@@ -42,5 +32,4 @@ jobs:
       - name: Deploy SNAPSHOT artifacts
         run: mvn -B deploy -DskipTests --file pom.xml
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
