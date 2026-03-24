@@ -73,19 +73,19 @@ class ConfigServiceTest {
         assertThat(taskConfigs, hasSize(3));
 
         BaseTaskConfig taskConfig1 = taskConfigs.get(0);
-        assertThat(taskConfig1, instanceOf(AcpInitTaskConfig.class));
-        assertThat(taskConfig1.getType(), CoreMatchers.is(TaskEnum.acpInit));
+        assertThat(taskConfig1, instanceOf(BashExecConditionTaskConfig.class));
+        BashExecConditionTaskConfig bashExecConditionTaskConfig = (BashExecConditionTaskConfig) taskConfig1;
+        assertThat(bashExecConditionTaskConfig.getId(), is("checkCondition"));
+        assertThat(bashExecConditionTaskConfig.getType(), CoreMatchers.is(TaskEnum.bashExecCondition));
+        assertThat(bashExecConditionTaskConfig.getBash(), is("echo yes"));
+        assertThat(bashExecConditionTaskConfig.getExpectedResult(), is("yes"));
 
         BaseTaskConfig taskConfig2 = taskConfigs.get(1);
-        assertThat(taskConfig2, instanceOf(BashExecConditionTaskConfig.class));
-        BashExecConditionTaskConfig bashExecConditionTaskConfig = (BashExecConditionTaskConfig) taskConfig2;
-        assertThat(bashExecConditionTaskConfig.getId(), is("checkVersion"));
-        assertThat(bashExecConditionTaskConfig.getType(), CoreMatchers.is(TaskEnum.bashExecCondition));
-        assertThat(bashExecConditionTaskConfig.getBash(), is("echo 1.0"));
-        assertThat(bashExecConditionTaskConfig.getExpectedResult(), is("1.0"));
+        assertThat(taskConfig2, instanceOf(BashExecTaskConfig.class));
+        assertThat(taskConfig2.getId(), is("onTrue"));
 
         BaseTaskConfig taskConfig3 = taskConfigs.get(2);
-        assertThat(taskConfig3, instanceOf(AcpExecTaskConfig.class));
-        assertThat(taskConfig3.getId(), is("summary"));
+        assertThat(taskConfig3, instanceOf(BashExecTaskConfig.class));
+        assertThat(taskConfig3.getId(), is("onFalse"));
     }
 }

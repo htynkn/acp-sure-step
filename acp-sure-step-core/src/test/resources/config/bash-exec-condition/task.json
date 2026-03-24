@@ -1,23 +1,20 @@
 {
   "tasks": [
     {
-      "id": "acpInit",
-      "type": "acpInit",
-      "command": "qwen",
-      "args": [
-        "--acp"
-      ]
-    },
-    {
-      "id": "checkVersion",
+      "id": "checkCondition",
       "type": "bashExecCondition",
-      "bash": "echo 1.0",
-      "expectedResult": "1.0"
+      "bash": "echo yes",
+      "expectedResult": "yes"
     },
     {
-      "id": "summary",
-      "type": "acpExec",
-      "prompt": "prompt.md"
+      "id": "onTrue",
+      "type": "bashExec",
+      "bash": "echo true_branch > result.txt"
+    },
+    {
+      "id": "onFalse",
+      "type": "bashExec",
+      "bash": "echo false_branch > result.txt"
     }
   ]
 }
