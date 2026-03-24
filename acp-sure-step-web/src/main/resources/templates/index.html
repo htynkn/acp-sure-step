@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACP Sure Step – Web UI</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .flow-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 0;
+        }
+        .step-card {
+            min-width: 140px;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, transform 0.15s ease;
+            border-radius: 10px;
+        }
+        .step-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.18); transform: translateY(-2px); }
+        .step-arrow { font-size: 1.6rem; color: #6c757d; line-height: 1; user-select: none; }
+        .step-pending   { border-left: 6px solid #6c757d; }
+        .step-running   { border-left: 6px solid #0d6efd; animation: pulse 1.2s infinite; }
+        .step-completed { border-left: 6px solid #198754; }
+        .step-failed    { border-left: 6px solid #dc3545; }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(13,110,253,.4); }
+            70%  { box-shadow: 0 0 0 8px rgba(13,110,253,0); }
+            100% { box-shadow: 0 0 0 0 rgba(13,110,253,0); }
+        }
+        #logContent { max-height: 420px; overflow-y: auto; font-size: .85rem; }
+        .file-list-item { cursor: pointer; }
+        .file-list-item:hover { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-bold">⚙ ACP Sure Step – Web UI</span>
+    </div>
+</nav>
+
+<div id="app" class="container">
+
+    <!-- Toast notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999">
+        <div v-if="toast.show" class="toast show align-items-center"
+             :class="'text-bg-' + toast.type" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">{{ toast.message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        @click="toast.show = false"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Browser Modal -->
+    <div v-if="fileBrowser.open" class="modal show d-block" tabindex="-1"
+         style="background:rgba(0,0,0,.45)" @click.self="fileBrowser.open = false">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select File</h5>
+                    <button type="button" class="btn-close" @click="fileBrowser.open = false"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Current path breadcrumb -->
+                    <div class="px-3 py-2 border-bottom bg-light font-monospace small text-truncate">
+                        {{ fileBrowser.currentPath }}
+                    </div>
+                    <!-- Loading/error -->
+                    <div v-if="fileBrowser.loading" class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                    <div v-else-if="fileBrowser.error" class="alert alert-danger m-3">{{ fileBrowser.error }}</div>
+                    <div v-else class="list-group list-group-flush">
+                        <!-- Parent directory -->
+                        <button v-if="fileBrowser.parentPath"
+                                class="list-group-item list-group-item-action file-list-item"
+                                @click="browseTo(fileBrowser.parentPath)">
+                            📁 ..
+                        </button>
+                        <!-- Entries: directories first, then files -->
+                        <button v-for="entry in fileBrowser.entries" :key="entry.path"
+                                class="list-group-item list-group-item-action file-list-item d-flex align-items-center gap-2"
+                                @click="entry.directory ? browseTo(entry.path) : pickFile(entry.path)">
+                            <span>{{ entry.directory ? '📁' : '📄' }}</span>
+                            <span class="text-truncate">{{ entry.name }}</span>
+                        </button>
+                        <div v-if="!fileBrowser.parentPath && fileBrowser.entries.length === 0"
+                             class="list-group-item text-muted fst-italic">
+                            (empty directory)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-semibold">Flow Configuration</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Task file (task.json)</label>
+                    <div class="input-group">
+                        <input v-model="taskFile" type="text" class="form-control" placeholder="/path/to/task.json">
+                        <button class="btn btn-outline-secondary" type="button"
+                                @click="openFileBrowser('taskFile')">Browse…</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Flow file (config.xml)</label>
+                    <div class="input-group">
+                        <input v-model="flowFile" type="text" class="form-control" placeholder="/path/to/config.xml">
+                        <button class="btn btn-outline-secondary" type="button"
+                                @click="openFileBrowser('flowFile')">Browse…</button>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" :disabled="loadBusy" @click="loadFlow">
+                        <span v-if="loadBusy" class="spinner-border spinner-border-sm me-1"></span>
+                        Load Flow
+                    </button>
+                </div>
+            </div>
+            <div v-if="loadError" class="alert alert-danger mt-3 mb-0">{{ loadError }}</div>
+        </div>
+    </div>
+
+    <!-- Flow visualization -->
+    <div v-if="flowLoaded" class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Flow Chain</span>
+            <button class="btn btn-success btn-sm" :disabled="status.running" @click="startFlow">
+                <span v-if="status.running" class="spinner-border spinner-border-sm me-1"></span>
+                ▶ Start Flow
+            </button>
+        </div>
+        <div class="card-body">
+            <!-- Status banner -->
+            <div v-if="status.running"   class="alert alert-info  mb-3">⏳ Flow is running…</div>
+            <div v-if="status.completed" class="alert alert-success mb-3">✅ Flow completed successfully.</div>
+            <div v-if="status.failed"    class="alert alert-danger mb-3">❌ Flow failed: {{ status.errorMessage }}</div>
+
+            <!-- Step cards -->
+            <div class="flow-container">
+                <template v-for="(step, idx) in status.steps" :key="step.id">
+                    <span v-if="idx > 0" class="step-arrow">→</span>
+                    <div class="card step-card p-2 text-center"
+                         :class="'step-' + step.state.toLowerCase()"
+                         :title="'Click to view logs for ' + step.id"
+                         @click="showLogs(step)">
+                        <div class="fw-bold small mb-1">{{ step.id }}</div>
+                        <span class="badge text-white" :class="badgeClass(step.state)">{{ step.state }}</span>
+                        <div v-if="step.errorMessage" class="text-danger small mt-1">{{ step.errorMessage }}</div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log panel -->
+    <div v-if="selectedStep" class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+            <span>Logs for step: <span class="badge bg-secondary">{{ selectedStep }}</span></span>
+            <button type="button" class="btn-close" @click="selectedStep = null"></button>
+        </div>
+        <div class="card-body p-0">
+            <pre id="logContent" class="bg-dark text-light rounded p-3 mb-0">{{ logContent }}</pre>
+        </div>
+    </div>
+
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/vue.global.prod.js"></script>
+<script>
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            taskFile: '',
+            flowFile: '',
+            loadBusy: false,
+            loadError: null,
+            flowLoaded: false,
+            status: { loaded: false, running: false, completed: false, failed: false, errorMessage: null, steps: [] },
+            selectedStep: null,
+            logLines: [],
+            logError: null,
+            pollTimer: null,
+            pollFailures: 0,
+            toast: { show: false, type: 'danger', message: '' },
+            fileBrowser: {
+                open: false,
+                target: null,       // 'taskFile' or 'flowFile'
+                currentPath: '',
+                parentPath: null,
+                entries: [],
+                loading: false,
+                error: null
+            }
+        };
+    },
+    computed: {
+        logContent() {
+            if (this.logError) return this.logError;
+            return this.logLines.length ? this.logLines.join('\n') : '(no logs captured for this step)';
+        }
+    },
+    methods: {
+        showToast(message, type = 'danger') {
+            this.toast = { show: true, type, message };
+            setTimeout(() => { this.toast.show = false; }, 4000);
+        },
+
+        /* ── file browser ── */
+        openFileBrowser(target) {
+            this.fileBrowser.target = target;
+            this.fileBrowser.open = true;
+            // Start in the directory of the current value (if any), otherwise user home
+            const current = this[target];
+            let startPath = '';
+            if (current && current.trim()) {
+                const lastSlash = current.trim().lastIndexOf('/');
+                startPath = lastSlash > 0 ? current.trim().slice(0, lastSlash) : current.trim();
+            }
+            this.browseTo(startPath);
+        },
+        async browseTo(path) {
+            this.fileBrowser.loading = true;
+            this.fileBrowser.error = null;
+            try {
+                const url = '/api/files' + (path ? '?path=' + encodeURIComponent(path) : '');
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (!resp.ok) {
+                    this.fileBrowser.error = data.error || 'Failed to list directory.';
+                    return;
+                }
+                this.fileBrowser.currentPath = data.currentPath;
+                this.fileBrowser.parentPath  = data.parentPath;
+                this.fileBrowser.entries     = data.entries;
+            } catch (e) {
+                this.fileBrowser.error = 'Failed to browse: ' + e.message;
+            } finally {
+                this.fileBrowser.loading = false;
+            }
+        },
+        pickFile(path) {
+            this[this.fileBrowser.target] = path;
+            this.fileBrowser.open = false;
+        },
+
+        /* ── flow lifecycle ── */
+        async loadFlow() {
+            if (!this.taskFile.trim() || !this.flowFile.trim()) {
+                this.loadError = 'Please enter both file paths.';
+                return;
+            }
+            this.loadBusy = true;
+            this.loadError = null;
+            try {
+                const body = new URLSearchParams({ taskFile: this.taskFile.trim(), flowFile: this.flowFile.trim() });
+                const resp = await fetch('/api/flow/load', { method: 'POST', body });
+                const data = await resp.json();
+                if (!data.loaded) {
+                    this.loadError = data.errorMessage || 'Failed to load flow.';
+                } else {
+                    this.status = data;
+                    this.flowLoaded = true;
+                    this.selectedStep = null;
+                }
+            } catch (e) {
+                this.loadError = 'Request failed: ' + e.message;
+            } finally {
+                this.loadBusy = false;
+            }
+        },
+        async startFlow() {
+            try {
+                const resp = await fetch('/api/flow/start', { method: 'POST' });
+                const data = await resp.json();
+                if (data.error) {
+                    this.showToast(data.error);
+                } else {
+                    this.pollFailures = 0;
+                    this.startPolling();
+                }
+            } catch (e) {
+                this.showToast('Failed to start flow: ' + e.message);
+            }
+        },
+        startPolling() {
+            this.stopPolling();
+            this.pollTimer = setInterval(this.pollStatus, 1000);
+        },
+        stopPolling() {
+            if (this.pollTimer) { clearInterval(this.pollTimer); this.pollTimer = null; }
+        },
+        async pollStatus() {
+            try {
+                const resp = await fetch('/api/flow/status');
+                if (!resp.ok) throw new Error('Server returned ' + resp.status);
+                const data = await resp.json();
+                this.status = data;
+                this.pollFailures = 0;
+                if (!data.running) this.stopPolling();
+            } catch (e) {
+                this.pollFailures++;
+                if (this.pollFailures >= 3) {
+                    this.stopPolling();
+                    this.showToast('Lost connection while polling flow status.');
+                }
+            }
+        },
+        async showLogs(step) {
+            this.selectedStep = step.id;
+            this.logLines = [];
+            this.logError = null;
+            try {
+                const resp = await fetch('/api/flow/logs/' + encodeURIComponent(step.id));
+                if (!resp.ok) throw new Error('Server returned ' + resp.status);
+                this.logLines = await resp.json();
+            } catch (e) {
+                this.logError = 'Failed to load logs: ' + e.message;
+            }
+        },
+        badgeClass(state) {
+            return {
+                PENDING:   'bg-secondary',
+                RUNNING:   'bg-primary',
+                COMPLETED: 'bg-success',
+                FAILED:    'bg-danger'
+            }[state] || 'bg-secondary';
+        }
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
