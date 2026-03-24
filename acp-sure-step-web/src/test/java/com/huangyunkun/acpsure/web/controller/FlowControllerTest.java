@@ -6,11 +6,14 @@ import com.huangyunkun.acpsure.web.model.StepState;
 import com.huangyunkun.acpsure.web.service.FlowExecutionService;
 import com.huangyunkun.acpsure.web.service.NodeLogStore;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -107,5 +110,33 @@ class FlowControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0]").value("line one"))
                 .andExpect(jsonPath("$[1]").value("line two"));
+    }
+
+    @Test
+    void listFilesShouldReturnDirectoryContents(@TempDir Path tempDir) throws Exception {
+        new File(tempDir.toFile(), "subdir").mkdir();
+        new File(tempDir.toFile(), "file.txt").createNewFile();
+
+        mockMvc.perform(get("/api/files").param("path", tempDir.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentPath").value(tempDir.toAbsolutePath().toString()))
+                .andExpect(jsonPath("$.entries").isArray());
+    }
+
+    @Test
+    void listFilesShouldReturnBadRequestForNonExistentPath() throws Exception {
+        mockMvc.perform(get("/api/files").param("path", "/nonexistent/path/xyz"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    void listFilesShouldReturnBadRequestForFilePath(@TempDir Path tempDir) throws Exception {
+        File file = new File(tempDir.toFile(), "notadir.txt");
+        file.createNewFile();
+
+        mockMvc.perform(get("/api/files").param("path", file.getAbsolutePath()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
     }
 }

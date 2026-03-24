@@ -1,5 +1,7 @@
 package com.huangyunkun.acpsure.web.controller;
 
+import com.huangyunkun.acpsure.web.model.FileEntry;
+import com.huangyunkun.acpsure.web.model.FileListing;
 import com.huangyunkun.acpsure.web.model.FlowStatus;
 import com.huangyunkun.acpsure.web.service.FlowExecutionService;
 import com.huangyunkun.acpsure.web.service.NodeLogStore;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -84,5 +89,36 @@ public class FlowController {
     @ResponseBody
     public List<String> getLogs(@PathVariable("stepId") String stepId) {
         return nodeLogStore.getLogs(stepId);
+    }
+
+    /**
+     * List files and directories at the given server-side path.
+     * Defaults to the user home directory when no path is supplied.
+     */
+    @GetMapping("/api/files")
+    @ResponseBody
+    public ResponseEntity<?> listFiles(
+            @RequestParam(value = "path", defaultValue = "") String path) {
+        String startPath = path.isBlank() ? System.getProperty("user.home") : path;
+        File dir = new File(startPath).getAbsoluteFile();
+        if (!dir.exists()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Path does not exist: " + dir));
+        }
+        if (!dir.isDirectory()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Not a directory: " + dir));
+        }
+        File[] children = dir.listFiles();
+        List<FileEntry> entries = (children == null ? new File[0] : children).length == 0
+                ? List.of()
+                : Arrays.stream(children == null ? new File[0] : children)
+                        .filter(f -> !f.isHidden())
+                        .sorted(Comparator.comparing(File::isFile)   // directories first
+                                          .thenComparing(f -> f.getName().toLowerCase()))
+                        .map(f -> new FileEntry(f.getName(), f.getAbsolutePath(), f.isDirectory()))
+                        .toList();
+
+        File parent = dir.getParentFile();
+        String parentPath = parent != null ? parent.getAbsolutePath() : null;
+        return ResponseEntity.ok(new FileListing(dir.getAbsolutePath(), parentPath, entries));
     }
 }
