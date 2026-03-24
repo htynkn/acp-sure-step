@@ -25,6 +25,16 @@ jobs:
           server-username: OSSRH_USERNAME
           server-password: OSSRH_TOKEN
 
+      - name: Validate deploy credentials
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+        run: |
+          if [ -z "$OSSRH_USERNAME" ] || [ -z "$OSSRH_TOKEN" ]; then
+            echo "::error title=Missing Secrets::OSSRH_USERNAME and/or OSSRH_TOKEN are not configured. Add them in Settings > Secrets and variables > Actions. Generate User Tokens at https://central.sonatype.com/account"
+            exit 1
+          fi
+
       - name: Build and test
         run: mvn -B test --file pom.xml
 
