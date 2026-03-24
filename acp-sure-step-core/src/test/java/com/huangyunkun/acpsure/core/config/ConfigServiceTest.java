@@ -5,6 +5,7 @@ import com.huangyunkun.acpsure.core.config.dto.AcpExecTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.AcpInitTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.BaseTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.BashExecTaskConfig;
+import com.huangyunkun.acpsure.core.config.dto.BashExecConditionTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.TaskEnum;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,31 @@ class ConfigServiceTest {
         assertThat(bashExecTaskConfig.getId(), is("getIp"));
         assertThat(bashExecTaskConfig.getType(), CoreMatchers.is(TaskEnum.bashExec));
         assertThat(bashExecTaskConfig.getBash(), is("wget https://ipinfo.io/ip -qO- >> ip.txt"));
+
+        BaseTaskConfig taskConfig3 = taskConfigs.get(2);
+        assertThat(taskConfig3, instanceOf(AcpExecTaskConfig.class));
+        assertThat(taskConfig3.getId(), is("summary"));
+    }
+
+    @Test
+    void shouldEnableLoadBashExecConditionTask() throws Exception {
+        ConfigService configService = new ConfigService();
+
+        List<BaseTaskConfig> taskConfigs = configService.loadTask(Resources.getResource("config/bash-exec-condition/task.json").getFile());
+
+        assertThat(taskConfigs, hasSize(3));
+
+        BaseTaskConfig taskConfig1 = taskConfigs.get(0);
+        assertThat(taskConfig1, instanceOf(AcpInitTaskConfig.class));
+        assertThat(taskConfig1.getType(), CoreMatchers.is(TaskEnum.acpInit));
+
+        BaseTaskConfig taskConfig2 = taskConfigs.get(1);
+        assertThat(taskConfig2, instanceOf(BashExecConditionTaskConfig.class));
+        BashExecConditionTaskConfig bashExecConditionTaskConfig = (BashExecConditionTaskConfig) taskConfig2;
+        assertThat(bashExecConditionTaskConfig.getId(), is("checkVersion"));
+        assertThat(bashExecConditionTaskConfig.getType(), CoreMatchers.is(TaskEnum.bashExecCondition));
+        assertThat(bashExecConditionTaskConfig.getBash(), is("echo 1.0"));
+        assertThat(bashExecConditionTaskConfig.getExpectedResult(), is("1.0"));
 
         BaseTaskConfig taskConfig3 = taskConfigs.get(2);
         assertThat(taskConfig3, instanceOf(AcpExecTaskConfig.class));

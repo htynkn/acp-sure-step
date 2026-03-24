@@ -57,15 +57,17 @@ com.huangyunkun.acpsure.cli/
 | `AcpInitNode` | LiteFlow node for initializing ACP sessions |
 | `AcpExecNode` | LiteFlow node for executing ACP prompts |
 | `BashExecNode` | LiteFlow node for executing bash commands |
+| `BashExecConditionNode` | LiteFlow boolean node for executing bash commands with expected result validation |
 | `SureStepCommand` | CLI entry point with picocli |
 
 ### Task Types
 
-The system supports three task types defined in `TaskEnum`:
+The system supports four task types defined in `TaskEnum`:
 
 - `acpInit` - Initialize ACP client with a command
 - `acpExec` - Execute a prompt via ACP
 - `bashExec` - Execute bash shell commands
+- `bashExecCondition` - Execute bash commands and validate output against an expected result (boolean condition node)
 
 ## Building and Running
 

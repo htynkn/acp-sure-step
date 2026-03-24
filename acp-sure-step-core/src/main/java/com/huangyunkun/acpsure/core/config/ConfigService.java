@@ -51,6 +51,11 @@ public class ConfigService {
                         .setName(taskConfig.getId())
                         .setClazz("com.huangyunkun.acpsure.core.node.BashExecNode")
                         .build();
+            } else if (taskConfig.getType() == TaskEnum.bashExecCondition) {
+                LiteFlowNodeBuilder.createBooleanNode().setId(taskConfig.getId())
+                        .setName(taskConfig.getId())
+                        .setClazz("com.huangyunkun.acpsure.core.node.BashExecConditionNode")
+                        .build();
             }
         }
 

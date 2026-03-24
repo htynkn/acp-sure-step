@@ -1,0 +1,23 @@
+{
+  "tasks": [
+    {
+      "id": "acpInit",
+      "type": "acpInit",
+      "command": "qwen",
+      "args": [
+        "--acp"
+      ]
+    },
+    {
+      "id": "checkVersion",
+      "type": "bashExecCondition",
+      "bash": "echo 1.0",
+      "expectedResult": "1.0"
+    },
+    {
+      "id": "summary",
+      "type": "acpExec",
+      "prompt": "prompt.md"
+    }
+  ]
+}
