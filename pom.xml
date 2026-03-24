@@ -12,6 +12,7 @@
     <modules>
         <module>acp-sure-step-core</module>
         <module>acp-sure-step-cli</module>
+        <module>acp-sure-step-web</module>
     </modules>
 
     <properties>
