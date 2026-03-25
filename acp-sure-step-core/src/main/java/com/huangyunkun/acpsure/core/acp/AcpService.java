@@ -8,6 +8,7 @@ import com.agentclientprotocol.sdk.spec.AcpSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,17 @@ public class AcpService {
         transport.setStdErrorHandler(err -> System.err.println("[AcpService][stderr] " + err));
 
         client = AcpClient.sync(transport)
-                .clientCapabilities(new AcpSchema.ClientCapabilities(new AcpSchema.FileSystemCapability(true, true), true))
+                .requestTimeout(Duration.ofMinutes(60))
+                .clientCapabilities(new AcpSchema.ClientCapabilities(
+                        new AcpSchema.FileSystemCapability(true, true), true))
+                .requestPermissionHandler(req -> {
+                    System.out.println("Permission requested: " + req.toolCall().title());
+                    for (AcpSchema.PermissionOption option : req.options()) {
+                        System.out.println("Option: " + option.optionId() + ", description: " + option.name());
+                    }
+                    return new AcpSchema.RequestPermissionResponse(
+                            new AcpSchema.PermissionSelected(req.options().get(0).optionId()));
+                })
                 .sessionUpdateConsumer(notification -> {
                     if (notification.update() instanceof AcpSchema.AgentMessageChunk msg
                             && msg.content() instanceof AcpSchema.TextContent textContent) {
