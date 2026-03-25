@@ -2,6 +2,7 @@ package com.huangyunkun.acpsure.core.arch;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,9 @@ class CoreArchitectureTest {
 
     @BeforeAll
     static void setUp() {
-        importedClasses = new ClassFileImporter().importPackages("com.huangyunkun.acpsure.core");
+        importedClasses = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.huangyunkun.acpsure.core");
     }
 
     @Test
