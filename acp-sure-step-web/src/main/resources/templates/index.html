@@ -3,48 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACP Sure Step – Web UI</title>
+    <title>ACP Sure Step &#8211; Web UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <style>
-        body { background-color: #f8f9fa; }
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-primary-dark: #3730a3;
+            --brand-primary-light: #eef2ff;
+            --brand-success: #059669;
+            --brand-success-light: #d1fae5;
+            --brand-danger: #dc2626;
+            --brand-danger-light: #fee2e2;
+            --brand-info-light: #dbeafe;
+            --surface: #ffffff;
+            --surface-muted: #f9fafb;
+            --border: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: #f3f4f6;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+            box-shadow: 0 4px 24px rgba(67, 56, 202, 0.25);
+        }
+        .app-header-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+        }
+        .app-header-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            backdrop-filter: blur(4px);
+        }
+        .app-header-title {
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+        .app-header-subtitle {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-top: 1px;
+        }
+        .app-header-badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.85);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Cards */
+        .ui-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .ui-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+        }
+        .ui-card-header-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-right: 8px;
+        }
+        .icon-config { background: var(--brand-primary-light); }
+        .icon-flow   { background: var(--brand-success-light); }
+        .icon-logs   { background: #1f2937; color: #e5e7eb; }
+        .ui-card-body { padding: 20px; }
+
+        /* Form controls */
+        .form-label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            transition: border-color 0.15s, box-shadow 0.15s;
+            background: var(--surface);
+        }
+        .form-control:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+            outline: none;
+        }
+        .form-control::placeholder { color: var(--text-muted); }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 8px 18px;
+            transition: all 0.18s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--brand-primary-dark) 0%, #2e27a0 100%);
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
+            transform: translateY(-1px);
+            color: #fff;
+        }
+        .btn-primary:disabled { opacity: 0.65; }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, var(--brand-success) 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+        }
+        .btn-success:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--brand-success) 0%, #047857 100%);
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.45);
+            transform: translateY(-1px);
+            color: #fff;
+        }
+        .btn-success:disabled { opacity: 0.65; }
+        .btn-outline-secondary {
+            background: var(--surface);
+            border: 1.5px solid var(--border) !important;
+            color: var(--text-secondary);
+        }
+        .btn-outline-secondary:hover {
+            background: var(--surface-muted);
+            border-color: #c4c7cc !important;
+            color: var(--text-primary);
+        }
+        .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+
+        /* Alerts */
+        .ui-alert {
+            border-radius: 10px;
+            border: none;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+        .ui-alert-info    { background: var(--brand-info-light);    color: #1d4ed8; }
+        .ui-alert-success { background: var(--brand-success-light); color: #065f46; }
+        .ui-alert-danger  { background: var(--brand-danger-light);  color: #991b1b; }
+
+        /* Flow visualization */
         .flow-container {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 12px;
-            padding: 24px 0;
+            gap: 14px;
+            padding: 12px 0 4px;
         }
         .step-card {
-            min-width: 140px;
+            min-width: 150px;
             cursor: pointer;
-            transition: box-shadow 0.2s ease, transform 0.15s ease;
-            border-radius: 10px;
+            transition: all 0.22s ease;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            padding: 14px 12px 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .step-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.18); transform: translateY(-2px); }
-        .step-arrow { font-size: 1.6rem; color: #6c757d; line-height: 1; user-select: none; }
-        .step-pending   { border-left: 6px solid #6c757d; }
-        .step-running   { border-left: 6px solid #0d6efd; animation: pulse 1.2s infinite; }
-        .step-completed { border-left: 6px solid #198754; }
-        .step-failed    { border-left: 6px solid #dc3545; }
-        @keyframes pulse {
-            0%   { box-shadow: 0 0 0 0 rgba(13,110,253,.4); }
-            70%  { box-shadow: 0 0 0 8px rgba(13,110,253,0); }
-            100% { box-shadow: 0 0 0 0 rgba(13,110,253,0); }
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            border-radius: 12px 12px 0 0;
         }
-        #logContent { max-height: 420px; overflow-y: auto; font-size: .85rem; }
-        .file-list-item { cursor: pointer; }
-        .file-list-item:hover { background-color: #f0f0f0; }
+        .step-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-3px);
+            border-color: transparent;
+        }
+        .step-arrow {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            line-height: 1;
+            user-select: none;
+        }
+        .step-pending::before   { background: var(--text-muted); }
+        .step-running::before   { background: var(--brand-primary); }
+        .step-completed::before { background: var(--brand-success); }
+        .step-failed::before    { background: var(--brand-danger); }
+
+        .step-running { animation: pulse-glow 1.4s ease-in-out infinite; }
+        @keyframes pulse-glow {
+            0%   { box-shadow: 0 0 0 0 rgba(79,70,229,.3); }
+            60%  { box-shadow: 0 0 0 10px rgba(79,70,229,0); }
+            100% { box-shadow: 0 0 0 0 rgba(79,70,229,0); }
+        }
+
+        .step-name { font-weight: 600; font-size: 0.82rem; margin-bottom: 8px; color: var(--text-primary); }
+        .step-error-msg { font-size: 0.75rem; margin-top: 6px; color: var(--brand-danger); }
+
+        /* Step badges */
+        .step-badge {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .badge-pending   { background: #f3f4f6; color: var(--text-secondary); }
+        .badge-running   { background: var(--brand-primary-light); color: var(--brand-primary); }
+        .badge-completed { background: var(--brand-success-light); color: var(--brand-success); }
+        .badge-failed    { background: var(--brand-danger-light);  color: var(--brand-danger); }
+
+        /* Log panel */
+        #logContent {
+            max-height: 440px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            line-height: 1.65;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 0 0 13px 13px;
+            padding: 18px 20px;
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', monospace;
+        }
+        #logContent::-webkit-scrollbar { width: 6px; }
+        #logContent::-webkit-scrollbar-track { background: #1e293b; }
+        #logContent::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+        /* File browser */
+        .file-list-item { cursor: pointer; font-size: 0.875rem; }
+        .file-list-item:hover { background: var(--brand-primary-light); color: var(--brand-primary); }
+
+        /* Toast */
+        .toast { border-radius: 10px; font-size: 0.875rem; }
+
+        /* Modal */
+        .modal-content { border-radius: 14px; border: none; }
+        .modal-header { border-bottom: 1px solid var(--border); padding: 16px 20px; }
+        .modal-title { font-weight: 600; font-size: 0.95rem; }
+
+        /* Misc */
+        .badge-step-id {
+            background: #374151;
+            color: #e5e7eb;
+            font-family: ui-monospace, monospace;
+            font-size: 0.78rem;
+            border-radius: 6px;
+            padding: 2px 8px;
+        }
+        .btn-close-custom {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .btn-close-custom:hover { background: #f3f4f6; color: var(--text-primary); }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-        <span class="navbar-brand fw-bold">⚙ ACP Sure Step – Web UI</span>
+<header class="app-header mb-4">
+    <div class="app-header-inner container-fluid">
+        <div class="app-header-icon">&#9881;</div>
+        <div>
+            <div class="app-header-title">ACP Sure Step</div>
+            <div class="app-header-subtitle">Workflow Execution Engine</div>
+        </div>
+        <span class="app-header-badge">Web UI</span>
     </div>
-</nav>
+</header>
 
-<div id="app" class="container">
+<div id="app" class="container pb-5">
 
     <!-- Toast notifications -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999">
@@ -60,40 +352,40 @@
 
     <!-- File Browser Modal -->
     <div v-if="fileBrowser.open" class="modal show d-block" tabindex="-1"
-         style="background:rgba(0,0,0,.45)" @click.self="fileBrowser.open = false">
+         style="background:rgba(0,0,0,.5)" @click.self="fileBrowser.open = false">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Select File</h5>
+                    <h5 class="modal-title">&#128194; Select File</h5>
                     <button type="button" class="btn-close" @click="fileBrowser.open = false"></button>
                 </div>
                 <div class="modal-body p-0">
                     <!-- Current path breadcrumb -->
-                    <div class="px-3 py-2 border-bottom bg-light font-monospace small text-truncate">
+                    <div class="px-3 py-2 border-bottom bg-light font-monospace small text-truncate" style="font-size:0.78rem;color:#6b7280;">
                         {{ fileBrowser.currentPath }}
                     </div>
                     <!-- Loading/error -->
                     <div v-if="fileBrowser.loading" class="text-center py-4">
-                        <span class="spinner-border text-primary"></span>
+                        <span class="spinner-border" style="color:var(--brand-primary)"></span>
                     </div>
-                    <div v-else-if="fileBrowser.error" class="alert alert-danger m-3">{{ fileBrowser.error }}</div>
+                    <div v-else-if="fileBrowser.error" class="m-3 ui-alert ui-alert-danger">{{ fileBrowser.error }}</div>
                     <div v-else class="list-group list-group-flush">
                         <!-- Parent directory -->
                         <button v-if="fileBrowser.parentPath"
                                 class="list-group-item list-group-item-action file-list-item"
                                 @click="browseTo(fileBrowser.parentPath)">
-                            📁 ..
+                            &#128193; ..
                         </button>
                         <!-- Entries: directories first, then files -->
                         <button v-for="entry in fileBrowser.entries" :key="entry.path"
                                 class="list-group-item list-group-item-action file-list-item d-flex align-items-center gap-2"
                                 @click="entry.directory ? browseTo(entry.path) : pickFile(entry.path)">
-                            <span>{{ entry.directory ? '📁' : '📄' }}</span>
+                            <span>{{ entry.directory ? '&#128193;' : '&#128196;' }}</span>
                             <span class="text-truncate">{{ entry.name }}</span>
                         </button>
                         <div v-if="!fileBrowser.parentPath && fileBrowser.entries.length === 0"
-                             class="list-group-item text-muted fst-italic">
-                            (empty directory)
+                             class="list-group-item text-muted fst-italic small">
+                             (empty directory)
                         </div>
                     </div>
                 </div>
@@ -102,63 +394,73 @@
     </div>
 
     <!-- Configuration form -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header fw-semibold">Flow Configuration</div>
-        <div class="card-body">
+    <div class="ui-card">
+        <div class="ui-card-header">
+            <span>
+                <span class="ui-card-header-icon icon-config">&#128295;</span>
+                Flow Configuration
+            </span>
+        </div>
+        <div class="ui-card-body">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Task file (task.json)</label>
+                    <label class="form-label">Task file <span style="font-weight:400;color:var(--text-muted);">(task.json)</span></label>
                     <div class="input-group">
                         <input v-model="taskFile" type="text" class="form-control" placeholder="/path/to/task.json">
                         <button class="btn btn-outline-secondary" type="button"
-                                @click="openFileBrowser('taskFile')">Browse…</button>
+                                @click="openFileBrowser('taskFile')">Browse&#8230;</button>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Flow file (config.xml)</label>
+                    <label class="form-label">Flow file <span style="font-weight:400;color:var(--text-muted);">(config.xml)</span></label>
                     <div class="input-group">
                         <input v-model="flowFile" type="text" class="form-control" placeholder="/path/to/config.xml">
                         <button class="btn btn-outline-secondary" type="button"
-                                @click="openFileBrowser('flowFile')">Browse…</button>
+                                @click="openFileBrowser('flowFile')">Browse&#8230;</button>
                     </div>
                 </div>
                 <div class="col-12">
                     <button class="btn btn-primary" :disabled="loadBusy" @click="loadFlow">
-                        <span v-if="loadBusy" class="spinner-border spinner-border-sm me-1"></span>
+                        <span v-if="loadBusy" class="spinner-border spinner-border-sm"></span>
+                        <span v-else>&#8599;</span>
                         Load Flow
                     </button>
                 </div>
             </div>
-            <div v-if="loadError" class="alert alert-danger mt-3 mb-0">{{ loadError }}</div>
+            <div v-if="loadError" class="ui-alert ui-alert-danger mt-3 mb-0">&#9888; {{ loadError }}</div>
         </div>
     </div>
 
     <!-- Flow visualization -->
-    <div v-if="flowLoaded" class="card shadow-sm mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-semibold">Flow Chain</span>
+    <div v-if="flowLoaded" class="ui-card">
+        <div class="ui-card-header">
+            <span>
+                <span class="ui-card-header-icon icon-flow">&#128279;</span>
+                Flow Chain
+            </span>
             <button class="btn btn-success btn-sm" :disabled="status.running" @click="startFlow">
-                <span v-if="status.running" class="spinner-border spinner-border-sm me-1"></span>
-                ▶ Start Flow
+                <span v-if="status.running" class="spinner-border spinner-border-sm"></span>
+                <span v-else>&#9654;</span>
+                {{ status.running ? 'Running...' : 'Start Flow' }}
             </button>
         </div>
-        <div class="card-body">
-            <!-- Status banner -->
-            <div v-if="status.running"   class="alert alert-info  mb-3">⏳ Flow is running…</div>
-            <div v-if="status.completed" class="alert alert-success mb-3">✅ Flow completed successfully.</div>
-            <div v-if="status.failed"    class="alert alert-danger mb-3">❌ Flow failed: {{ status.errorMessage }}</div>
+        <div class="ui-card-body">
+            <!-- Status banners -->
+            <div v-if="status.running"   class="ui-alert ui-alert-info">&#9203; Flow is running&#8230;</div>
+            <div v-if="status.completed" class="ui-alert ui-alert-success">&#9989; Flow completed successfully.</div>
+            <div v-if="status.failed"    class="ui-alert ui-alert-danger">&#10060; Flow failed: {{ status.errorMessage }}</div>
 
             <!-- Step cards -->
             <div class="flow-container">
                 <template v-for="(step, idx) in status.steps" :key="step.id">
-                    <span v-if="idx > 0" class="step-arrow">→</span>
-                    <div class="card step-card p-2 text-center"
+                    <span v-if="idx > 0" class="step-arrow">&#8594;</span>
+                    <div class="step-card"
                          :class="'step-' + step.state.toLowerCase()"
                          :title="'Click to view logs for ' + step.id"
                          @click="showLogs(step)">
-                        <div class="fw-bold small mb-1">{{ step.id }}</div>
-                        <span class="badge text-white" :class="badgeClass(step.state)">{{ step.state }}</span>
-                        <div v-if="step.errorMessage" class="text-danger small mt-1">{{ step.errorMessage }}</div>
+                        <div class="step-name">{{ step.id }}</div>
+                        <span class="step-badge" :class="badgeClass(step.state)">{{ step.state }}</span>
+                        <div v-if="step.errorMessage" class="step-error-msg">{{ step.errorMessage }}</div>
                     </div>
                 </template>
             </div>
@@ -166,14 +468,15 @@
     </div>
 
     <!-- Log panel -->
-    <div v-if="selectedStep" class="card shadow-sm mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
-            <span>Logs for step: <span class="badge bg-secondary">{{ selectedStep }}</span></span>
-            <button type="button" class="btn-close" @click="selectedStep = null"></button>
+    <div v-if="selectedStep" class="ui-card">
+        <div class="ui-card-header">
+            <span>
+                <span class="ui-card-header-icon icon-logs">&#9658;</span>
+                Logs &#8212; <span class="badge-step-id">{{ selectedStep }}</span>
+            </span>
+            <button class="btn-close-custom" @click="selectedStep = null" title="Close">&#10005;</button>
         </div>
-        <div class="card-body p-0">
-            <pre id="logContent" class="bg-dark text-light rounded p-3 mb-0">{{ logContent }}</pre>
-        </div>
+        <pre id="logContent">{{ logContent }}</pre>
     </div>
 
 </div>
@@ -200,7 +503,7 @@ createApp({
             toast: { show: false, type: 'danger', message: '' },
             fileBrowser: {
                 open: false,
-                target: null,       // 'taskFile' or 'flowFile'
+                target: null,
                 currentPath: '',
                 parentPath: null,
                 entries: [],
@@ -221,11 +524,10 @@ createApp({
             setTimeout(() => { this.toast.show = false; }, 4000);
         },
 
-        /* ── file browser ── */
+        /* -- file browser -- */
         openFileBrowser(target) {
             this.fileBrowser.target = target;
             this.fileBrowser.open = true;
-            // Start in the directory of the current value (if any), otherwise user home
             const current = this[target];
             let startPath = '';
             if (current && current.trim()) {
@@ -259,7 +561,7 @@ createApp({
             this.fileBrowser.open = false;
         },
 
-        /* ── flow lifecycle ── */
+        /* -- flow lifecycle -- */
         async loadFlow() {
             if (!this.taskFile.trim() || !this.flowFile.trim()) {
                 this.loadError = 'Please enter both file paths.';
@@ -335,11 +637,11 @@ createApp({
         },
         badgeClass(state) {
             return {
-                PENDING:   'bg-secondary',
-                RUNNING:   'bg-primary',
-                COMPLETED: 'bg-success',
-                FAILED:    'bg-danger'
-            }[state] || 'bg-secondary';
+                PENDING:   'badge-pending',
+                RUNNING:   'badge-running',
+                COMPLETED: 'badge-completed',
+                FAILED:    'badge-failed'
+            }[state] || 'badge-pending';
         }
     }
 }).mount('#app');
