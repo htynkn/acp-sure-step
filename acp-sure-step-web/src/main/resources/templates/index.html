@@ -7,12 +7,15 @@
     <!-- Bootswatch Flatly theme (Bootstrap 5) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/flatly/bootstrap.min.css">
     <style>
-        /* Step running pulse — cannot be expressed as a utility class */
+        /* Step running pulse — cannot be expressed as a utility class.
+           rgba(44,62,80) = Flatly primary #2c3e50 */
         .step-running { animation: pulse-border 1.4s ease-in-out infinite; }
         @keyframes pulse-border {
             0%, 100% { box-shadow: 0 0 0 0 rgba(44, 62, 80, 0.4); }
             50%       { box-shadow: 0 0 0 8px rgba(44, 62, 80, 0); }
         }
+        /* Step card sizing — no Bootstrap utility for min-width */
+        .step-card { min-width: 150px; cursor: pointer; }
         /* Log panel height cap */
         #logContent { max-height: 440px; overflow-y: auto; }
     </style>
@@ -139,8 +142,7 @@
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <template v-for="(step, idx) in status.steps" :key="step.id">
                     <span v-if="idx > 0" class="text-muted fs-5 user-select-none">→</span>
-                    <div class="card border-top border-3 text-center"
-                         style="min-width:150px; cursor:pointer;"
+                    <div class="card border-top border-3 text-center step-card"
                          :class="stepCardClass(step.state)"
                          :title="'Click to view logs for ' + step.id"
                          @click="showLogs(step)">
