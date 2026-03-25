@@ -14,4 +14,5 @@ public class AcpInitTaskConfig extends BaseTaskConfig{
     private String command;
     private List<String> args;
     private Map<String, String> env;
+    private String workspace;
 }
