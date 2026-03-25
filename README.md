@@ -124,7 +124,8 @@ java -jar acp-sure-step-cli/target/acp-sure-step-cli-1.0-SNAPSHOT.jar \
       "id": "acpInit",
       "type": "acpInit",
       "command": "qwen",
-      "args": ["--acp"]
+      "args": ["--acp"],
+      "workspace": "/optional/path/to/workspace"
     },
     {
       "id": "getInfo",
