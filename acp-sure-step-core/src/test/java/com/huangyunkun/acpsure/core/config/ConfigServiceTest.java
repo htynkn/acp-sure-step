@@ -7,6 +7,7 @@ import com.huangyunkun.acpsure.core.config.dto.BaseTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.BashExecTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.BashExecConditionTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.TaskEnum;
+import com.huangyunkun.acpsure.core.config.dto.VariableSetTaskConfig;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 
@@ -87,5 +88,26 @@ class ConfigServiceTest {
         BaseTaskConfig taskConfig3 = taskConfigs.get(2);
         assertThat(taskConfig3, instanceOf(BashExecTaskConfig.class));
         assertThat(taskConfig3.getId(), is("onFalse"));
+    }
+
+    @Test
+    void shouldEnableLoadVariableSetTask() throws Exception {
+        ConfigService configService = new ConfigService();
+
+        List<BaseTaskConfig> taskConfigs = configService.loadTask(Resources.getResource("config/variable-set/task.json").getFile());
+
+        assertThat(taskConfigs, hasSize(2));
+
+        BaseTaskConfig taskConfig1 = taskConfigs.get(0);
+        assertThat(taskConfig1, instanceOf(VariableSetTaskConfig.class));
+        VariableSetTaskConfig variableSetTaskConfig = (VariableSetTaskConfig) taskConfig1;
+        assertThat(variableSetTaskConfig.getId(), is("setVars"));
+        assertThat(variableSetTaskConfig.getType(), CoreMatchers.is(TaskEnum.variableSet));
+        assertThat(variableSetTaskConfig.getVariables().get("TARGET"), is("world"));
+        assertThat(variableSetTaskConfig.getVariables().get("OUTPUT_FILE"), is("output.txt"));
+
+        BaseTaskConfig taskConfig2 = taskConfigs.get(1);
+        assertThat(taskConfig2, instanceOf(BashExecTaskConfig.class));
+        assertThat(taskConfig2.getId(), is("printHello"));
     }
 }

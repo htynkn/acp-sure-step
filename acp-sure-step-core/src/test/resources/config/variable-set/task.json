@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "setVars",
+      "type": "variableSet",
+      "variables": {
+        "TARGET": "world",
+        "OUTPUT_FILE": "output.txt"
+      }
+    },
+    {
+      "id": "printHello",
+      "type": "bashExec",
+      "bash": "echo hello ${TARGET}"
+    }
+  ]
+}

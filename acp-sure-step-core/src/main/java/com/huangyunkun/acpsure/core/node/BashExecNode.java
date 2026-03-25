@@ -2,6 +2,7 @@ package com.huangyunkun.acpsure.core.node;
 
 import com.huangyunkun.acpsure.core.RunningContainer;
 import com.huangyunkun.acpsure.core.config.dto.BashExecTaskConfig;
+import com.huangyunkun.acpsure.core.util.VariableSubstitutionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -18,9 +19,10 @@ public class BashExecNode extends BaseNodeComponent {
         RunningContainer runningContainer = this.getContextBean(RunningContainer.class);
 
         String workDir = runningContainer.getCodeWorkSpace();
+        String bash = VariableSubstitutionUtil.substitute(taskConfig.getBash(), runningContainer.getVariables());
 
         ProcessResult result = new ProcessExecutor()
-                .command("bash", "-c", taskConfig.getBash())
+                .command("bash", "-c", bash)
                 .directory(workDir != null ? new File(workDir) : null)
                 .readOutput(true)
                 .execute();
@@ -32,7 +34,8 @@ public class BashExecNode extends BaseNodeComponent {
 
         int exitCode = result.getExitValue();
         if (exitCode != 0) {
-            throw new RuntimeException("Bash command exited with code " + exitCode + ": " + taskConfig.getBash());
+            throw new RuntimeException("Bash command exited with code " + exitCode + ": " + bash);
         }
     }
 }
+
