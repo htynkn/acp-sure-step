@@ -1,5 +1,7 @@
 package com.huangyunkun.acpsure.core.util;
 
+import org.apache.commons.text.StringSubstitutor;
+
 import java.util.Map;
 
 public class VariableSubstitutionUtil {
@@ -11,10 +13,6 @@ public class VariableSubstitutionUtil {
         if (command == null || variables == null || variables.isEmpty()) {
             return command;
         }
-        String result = command;
-        for (Map.Entry<String, String> entry : variables.entrySet()) {
-            result = result.replace("${" + entry.getKey() + "}", entry.getValue());
-        }
-        return result;
+        return StringSubstitutor.replace(command, variables);
     }
 }
