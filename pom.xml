@@ -32,14 +32,6 @@
         <zt-exec.version>1.12</zt-exec.version>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/htynkn/acp-sure-step</url>
-        </repository>
-    </distributionManagement>
-
     <repositories>
         <repository>
             <id>central-snapshots</id>
