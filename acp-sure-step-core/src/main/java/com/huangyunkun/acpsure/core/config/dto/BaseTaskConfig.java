@@ -10,7 +10,8 @@ import lombok.Data;
         @JsonSubTypes.Type(value = AcpInitTaskConfig.class, name = "acpInit"),
         @JsonSubTypes.Type(value = AcpExecTaskConfig.class, name = "acpExec"),
         @JsonSubTypes.Type(value = BashExecTaskConfig.class, name = "bashExec"),
-        @JsonSubTypes.Type(value = BashExecConditionTaskConfig.class, name = "bashExecCondition")
+        @JsonSubTypes.Type(value = BashExecConditionTaskConfig.class, name = "bashExecCondition"),
+        @JsonSubTypes.Type(value = VariableSetTaskConfig.class, name = "variableSet")
 })
 public class BaseTaskConfig {
     private String id;

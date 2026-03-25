@@ -4,5 +4,6 @@ public enum TaskEnum {
     acpInit,
     acpExec,
     bashExec,
-    bashExecCondition
+    bashExecCondition,
+    variableSet
 }

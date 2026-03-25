@@ -2,6 +2,7 @@ package com.huangyunkun.acpsure.core.node;
 
 import com.huangyunkun.acpsure.core.RunningContainer;
 import com.huangyunkun.acpsure.core.config.dto.BashExecConditionTaskConfig;
+import com.huangyunkun.acpsure.core.util.VariableSubstitutionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -18,9 +19,10 @@ public class BashExecConditionNode extends BaseBooleanNodeComponent {
         RunningContainer runningContainer = this.getContextBean(RunningContainer.class);
 
         String workDir = runningContainer.getCodeWorkSpace();
+        String bash = VariableSubstitutionUtil.substitute(taskConfig.getBash(), runningContainer.getVariables());
 
         ProcessResult result = new ProcessExecutor()
-                .command("bash", "-c", taskConfig.getBash())
+                .command("bash", "-c", bash)
                 .directory(workDir != null ? new File(workDir) : null)
                 .readOutput(true)
                 .exitValueAny()
@@ -37,3 +39,4 @@ public class BashExecConditionNode extends BaseBooleanNodeComponent {
         return matched;
     }
 }
+
