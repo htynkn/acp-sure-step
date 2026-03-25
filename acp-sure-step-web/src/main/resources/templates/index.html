@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACP Sure Step &#8211; Web UI</title>
+    <title>ACP Sure Step – Web UI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
             --text-muted: #9ca3af;
         }
 
-        * { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             background: #f3f4f6;
@@ -327,7 +327,7 @@
 
 <header class="app-header mb-4">
     <div class="app-header-inner container-fluid">
-        <div class="app-header-icon">&#9881;</div>
+        <div class="app-header-icon">⚙</div>
         <div>
             <div class="app-header-title">ACP Sure Step</div>
             <div class="app-header-subtitle">Workflow Execution Engine</div>
@@ -356,7 +356,7 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">&#128194; Select File</h5>
+                    <h5 class="modal-title">📂 Select File</h5>
                     <button type="button" class="btn-close" @click="fileBrowser.open = false"></button>
                 </div>
                 <div class="modal-body p-0">
@@ -374,13 +374,13 @@
                         <button v-if="fileBrowser.parentPath"
                                 class="list-group-item list-group-item-action file-list-item"
                                 @click="browseTo(fileBrowser.parentPath)">
-                            &#128193; ..
+                            📁 ..
                         </button>
                         <!-- Entries: directories first, then files -->
                         <button v-for="entry in fileBrowser.entries" :key="entry.path"
                                 class="list-group-item list-group-item-action file-list-item d-flex align-items-center gap-2"
                                 @click="entry.directory ? browseTo(entry.path) : pickFile(entry.path)">
-                            <span>{{ entry.directory ? '&#128193;' : '&#128196;' }}</span>
+                            <span>{{ entry.directory ? '📁' : '📄' }}</span>
                             <span class="text-truncate">{{ entry.name }}</span>
                         </button>
                         <div v-if="!fileBrowser.parentPath && fileBrowser.entries.length === 0"
@@ -397,7 +397,7 @@
     <div class="ui-card">
         <div class="ui-card-header">
             <span>
-                <span class="ui-card-header-icon icon-config">&#128295;</span>
+                <span class="ui-card-header-icon icon-config">🔧</span>
                 Flow Configuration
             </span>
         </div>
@@ -408,7 +408,7 @@
                     <div class="input-group">
                         <input v-model="taskFile" type="text" class="form-control" placeholder="/path/to/task.json">
                         <button class="btn btn-outline-secondary" type="button"
-                                @click="openFileBrowser('taskFile')">Browse&#8230;</button>
+                                @click="openFileBrowser('taskFile')">Browse…</button>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -416,18 +416,18 @@
                     <div class="input-group">
                         <input v-model="flowFile" type="text" class="form-control" placeholder="/path/to/config.xml">
                         <button class="btn btn-outline-secondary" type="button"
-                                @click="openFileBrowser('flowFile')">Browse&#8230;</button>
+                                @click="openFileBrowser('flowFile')">Browse…</button>
                     </div>
                 </div>
                 <div class="col-12">
                     <button class="btn btn-primary" :disabled="loadBusy" @click="loadFlow">
                         <span v-if="loadBusy" class="spinner-border spinner-border-sm"></span>
-                        <span v-else>&#8599;</span>
+                        <span v-else>↗</span>
                         Load Flow
                     </button>
                 </div>
             </div>
-            <div v-if="loadError" class="ui-alert ui-alert-danger mt-3 mb-0">&#9888; {{ loadError }}</div>
+            <div v-if="loadError" class="ui-alert ui-alert-danger mt-3 mb-0">⚠ {{ loadError }}</div>
         </div>
     </div>
 
@@ -435,25 +435,25 @@
     <div v-if="flowLoaded" class="ui-card">
         <div class="ui-card-header">
             <span>
-                <span class="ui-card-header-icon icon-flow">&#128279;</span>
+                <span class="ui-card-header-icon icon-flow">🔗</span>
                 Flow Chain
             </span>
             <button class="btn btn-success btn-sm" :disabled="status.running" @click="startFlow">
                 <span v-if="status.running" class="spinner-border spinner-border-sm"></span>
-                <span v-else>&#9654;</span>
+                <span v-else>▶</span>
                 {{ status.running ? 'Running...' : 'Start Flow' }}
             </button>
         </div>
         <div class="ui-card-body">
             <!-- Status banners -->
-            <div v-if="status.running"   class="ui-alert ui-alert-info">&#9203; Flow is running&#8230;</div>
-            <div v-if="status.completed" class="ui-alert ui-alert-success">&#9989; Flow completed successfully.</div>
-            <div v-if="status.failed"    class="ui-alert ui-alert-danger">&#10060; Flow failed: {{ status.errorMessage }}</div>
+            <div v-if="status.running"   class="ui-alert ui-alert-info">⏳ Flow is running…</div>
+            <div v-if="status.completed" class="ui-alert ui-alert-success">✅ Flow completed successfully.</div>
+            <div v-if="status.failed"    class="ui-alert ui-alert-danger">❌ Flow failed: {{ status.errorMessage }}</div>
 
             <!-- Step cards -->
             <div class="flow-container">
                 <template v-for="(step, idx) in status.steps" :key="step.id">
-                    <span v-if="idx > 0" class="step-arrow">&#8594;</span>
+                    <span v-if="idx > 0" class="step-arrow">→</span>
                     <div class="step-card"
                          :class="'step-' + step.state.toLowerCase()"
                          :title="'Click to view logs for ' + step.id"
@@ -471,10 +471,10 @@
     <div v-if="selectedStep" class="ui-card">
         <div class="ui-card-header">
             <span>
-                <span class="ui-card-header-icon icon-logs">&#9658;</span>
-                Logs &#8212; <span class="badge-step-id">{{ selectedStep }}</span>
+                <span class="ui-card-header-icon icon-logs">▶</span>
+                Logs — <span class="badge-step-id">{{ selectedStep }}</span>
             </span>
-            <button class="btn-close-custom" @click="selectedStep = null" title="Close">&#10005;</button>
+            <button class="btn-close-custom" @click="selectedStep = null" title="Close">✕</button>
         </div>
         <pre id="logContent">{{ logContent }}</pre>
     </div>
