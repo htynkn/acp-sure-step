@@ -8,115 +8,109 @@
 
 ## Project Overview
 
-**ACP Sure Step** is a Java-based CLI tool that executes task flows using ACP (Agent Client Protocol) agents. It provides a workflow engine powered by LiteFlow, allowing users to define and execute complex task sequences that can interact with AI agents and execute shell commands.
+**ACP Sure Step** is a Java-based workflow engine that executes task flows using ACP (Agent Client Protocol) agents. Powered by [LiteFlow](https://liteflow.cc/), it lets you define and run complex task sequences combining AI agent interactions with shell commands. It ships as both a **CLI tool** and a **Spring Boot web application**.
 
-### Architecture
+### Key Features
 
-The project is structured as a **Maven multi-module project**:
+- **Workflow orchestration** – Chain tasks in sequence or conditional branches using LiteFlow XML configuration
+- **ACP integration** – Initialize and drive AI agent sessions (e.g. Qwen) via the ACP SDK
+- **Bash execution** – Run shell commands with `${VARIABLE_NAME}` substitution support
+- **Boolean conditions** – Gate workflow branches on the output of bash commands
+- **Variable injection** – Pass runtime variables between workflow steps
+- **Dual interfaces** – Run workflows from the command line or through a web UI
+
+## Repository Structure
 
 ```
 acp-sure-step/
-├── acp-sure-step-core/    # Core business logic and workflow engine
-└── acp-sure-step-cli/     # CLI application and integration tests
+├── acp-sure-step-core/          # Core workflow engine and ACP integration
+│   └── src/main/java/…/core/
+│       ├── acp/                 # ACP client service
+│       ├── config/              # Configuration loading and DTOs
+│       ├── node/                # LiteFlow node components
+│       ├── util/                # Utility classes
+│       ├── SureStep.java        # Main workflow executor
+│       └── RunningContainer.java
+├── acp-sure-step-cli/           # CLI application (Spring Boot + picocli)
+│   └── src/
+│       ├── main/                # SureStepCliApplication, SureStepCommand
+│       └── integration-test/    # Integration tests and sample configs
+├── acp-sure-step-web/           # Web application (Spring Boot + Thymeleaf)
+│   └── src/main/java/…/web/
+│       ├── controller/          # REST controllers
+│       ├── service/             # Flow execution service
+│       └── templates/           # Thymeleaf UI templates
+├── website/                     # Jekyll documentation site
+├── pom.xml                      # Parent Maven POM
+├── mvnw / mvnw.cmd              # Maven wrapper scripts
+└── LICENSE                      # Apache License 2.0
 ```
 
-### Technology Stack
+## Technology Stack
 
-- **Java 17**
-- **Spring Boot 3.4.4** - Application framework
-- **LiteFlow 2.15.3** - Workflow/rule engine
-- **picocli 4.7.6** - Command-line interface framework
-- **ACP SDK 0.9.0-SNAPSHOT** - Agent Client Protocol for AI agent interaction
-- **Lombok** - Boilerplate reduction
-- **Jackson** - JSON processing
-- **zt-exec** - Process execution for bash commands
-- **JUnit 5** - Testing framework
+| Technology | Version | Purpose |
+|---|---|---|
+| Java | 17 | Runtime |
+| Spring Boot | 3.4.4 | Application framework |
+| LiteFlow | 2.15.3 | Workflow / rule engine |
+| picocli | 4.7.6 | CLI framework |
+| ACP Core SDK | 0.9.0-SNAPSHOT | Agent Client Protocol integration |
+| Thymeleaf | (via Spring Boot) | Web UI templating |
+| Jackson | 2.15.2 | JSON processing |
+| zt-exec | 1.12 | Subprocess / bash execution |
+| Lombok | 1.18.30 | Boilerplate reduction |
+| JUnit 5 / Hamcrest | — | Testing |
+| ArchUnit | 1.3.0 | Architecture constraint tests |
 
-### Package Structure
+## Prerequisites
 
-```
-com.huangyunkun.acpsure.core/
-├── acp/           # ACP client service
-├── config/        # Configuration loading and DTOs
-├── node/          # LiteFlow node components
-├── util/          # Utilities
-├── SureStep.java  # Main workflow executor
-└── RunningContainer.java  # Context bean for workflow execution
+- **JDK 17** or higher
+- **Maven 3.6+** (or use the included `./mvnw` wrapper — no installation needed)
 
-com.huangyunkun.acpsure.cli/
-└── SureStepCommand.java  # CLI command handler
-```
-
-### Core Components
-
-| Component | Description |
-|-----------|-------------|
-| `SureStep` | Main workflow executor that initializes and drives the flow |
-| `ConfigService` | Loads task configurations from JSON files |
-| `AcpService` | Manages ACP client connections and prompt execution |
-| `AcpInitNode` | LiteFlow node for initializing ACP sessions |
-| `AcpExecNode` | LiteFlow node for executing ACP prompts |
-| `BashExecNode` | LiteFlow node for executing bash commands |
-| `BashExecConditionNode` | LiteFlow boolean node for executing bash commands with expected result validation |
-| `VariableSetNode` | LiteFlow node for injecting variables into the flow context |
-| `SureStepCommand` | CLI entry point with picocli |
-
-### Task Types
-
-The system supports five task types defined in `TaskEnum`:
-
-- `acpInit` - Initialize ACP client with a command
-- `acpExec` - Execute a prompt via ACP
-- `bashExec` - Execute bash shell commands (supports `${VARIABLE_NAME}` substitution)
-- `bashExecCondition` - Execute bash commands and validate output against an expected result (boolean condition node, supports `${VARIABLE_NAME}` substitution)
-- `variableSet` - Inject named variables into the flow context for use by subsequent nodes
-
-## Building and Running
-
-### Prerequisites
-
-- JDK 17 or higher
-- Maven 3.6+
-
-### Build Commands
+## Setup & Installation
 
 ```bash
-# Clean and compile
+# Clone the repository
+git clone https://github.com/htynkn/acp-sure-step.git
+cd acp-sure-step
+
+# Compile all modules
 ./mvnw clean compile
 
-# Run tests
-./mvnw test
-
-# Run integration tests
-./mvnw failsafe:integration-test
-
-# Full build with all tests
-./mvnw clean verify
-
-# Package as executable JAR
-./mvnw clean package
+# Package all modules (produces executable JARs)
+./mvnw clean package -DskipTests
 ```
 
-### Running the CLI
+## Running
+
+### CLI
 
 ```bash
-# Run with task and flow configuration files
 java -jar acp-sure-step-cli/target/acp-sure-step-cli-1.0-SNAPSHOT.jar \
   -t path/to/task.json \
   -f path/to/config.xml
 ```
 
-### CLI Options
+| Option | Required | Description |
+|--------|----------|-------------|
+| `-t, --task` | Yes | Path to task configuration file (`task.json`) |
+| `-f, --flow` | Yes | Path to flow configuration file (`config.xml`) |
+| `-h, --help` | — | Show help message |
 
-| Option | Description |
-|--------|-------------|
-| `-t, --task` | Path to task configuration file (task.json) |
-| `-f, --flow` | Path to flow configuration file (config.xml) |
-| `-h, --help` | Show help message |
+### Web Application
 
-### Configuration Files
+```bash
+java -jar acp-sure-step-web/target/acp-sure-step-web-1.0-SNAPSHOT.jar
+```
 
-**task.json** - Defines the tasks to execute:
+The web UI is available at `http://localhost:8080` by default.
+
+## Configuration
+
+Workflows are defined by two files.
+
+### task.json — task definitions
+
 ```json
 {
   "tasks": [
@@ -136,7 +130,8 @@ java -jar acp-sure-step-cli/target/acp-sure-step-cli-1.0-SNAPSHOT.jar \
 }
 ```
 
-**config.xml** - Defines the flow chain:
+### config.xml — flow chain
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <flow>
@@ -146,30 +141,56 @@ java -jar acp-sure-step-cli/target/acp-sure-step-cli-1.0-SNAPSHOT.jar \
 </flow>
 ```
 
-## Development Conventions
+### Supported Task Types
 
-### Code Style
+| Type | Description |
+|------|-------------|
+| `acpInit` | Initialize an ACP client session with a given command |
+| `acpExec` | Execute a prompt via an active ACP session |
+| `bashExec` | Run a shell command (supports `${VARIABLE_NAME}` substitution) |
+| `bashExecCondition` | Run a shell command and validate its output (boolean gate) |
+| `variableSet` | Inject named variables into the flow context |
 
-- **Package naming**: `com.huangyunkun.acpsure.{core|cli}`
-- **Lombok**: Used for reducing boilerplate (`@Data`, `@Component`, etc.)
-- **Spring annotations**: Component scanning across core and cli packages
+## Building & Testing
 
-### Testing Practices
+```bash
+# Compile only
+./mvnw clean compile
 
-- **Unit tests**: Located in `src/test/java`, run with `mvn test`
-- **Integration tests**: Located in `src/integration-test/java`, suffixed with `IT`, run with `mvn failsafe:integration-test`
-- **Test frameworks**: JUnit 5, Hamcrest assertions
-- **Test resources**: Located in `src/test/resources` and `src/integration-test/resources`
+# Unit tests
+./mvnw test
 
-### Git Workflow
+# Integration tests
+./mvnw failsafe:integration-test
 
-- **Main branch**: `master`
-- **Feature branch**: `feature/spilt-to-cli`
-- **CI**: GitHub Actions runs `mvn compile` on push and pull requests
+# Full build + all tests + code coverage
+./mvnw clean verify
 
-### Module Responsibilities
+# Package JARs (skip tests)
+./mvnw clean package -DskipTests
+```
 
-| Module | Responsibility |
-|--------|----------------|
-| `acp-sure-step-core` | Core workflow engine, ACP integration, node components |
-| `acp-sure-step-cli` | CLI application, Spring Boot runner, integration tests |
+Integration tests live in `src/integration-test/java` and are suffixed with `IT`. Sample configurations for them are in `src/integration-test/resources/`.
+
+## Module Overview
+
+| Module | Responsibility | Entry Point |
+|--------|----------------|-------------|
+| `acp-sure-step-core` | Workflow engine, ACP integration, LiteFlow nodes, configuration loading | `SureStep.java` |
+| `acp-sure-step-cli` | CLI application, picocli command handler, integration tests | `SureStepCliApplication.java` |
+| `acp-sure-step-web` | Web UI and REST API for workflow execution | `SureStepWebApplication.java` |
+
+## Contributing
+
+1. Fork the repository and create a feature branch from `master`.
+2. Make your changes and add tests where appropriate.
+3. Ensure the full build passes: `./mvnw clean verify`.
+4. Open a pull request against `master` with a clear description of your changes.
+
+- Follow the existing package naming convention (`com.huangyunkun.acpsure.{core|cli|web}`).
+- Use Lombok to reduce boilerplate where it is already in use.
+- Unit tests go in `src/test/java`; integration tests go in `src/integration-test/java` and must be suffixed `IT`.
+
+## License
+
+This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
