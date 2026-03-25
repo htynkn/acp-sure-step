@@ -1,0 +1,22 @@
+title: ACP Sure Step
+description: >-
+  A Java-based workflow engine for orchestrating AI agent tasks using the Agent Client Protocol (ACP).
+  Define and execute complex task sequences that interact with AI agents and shell commands.
+baseurl: "/acp-sure-step"
+url: "https://htynkn.github.io"
+
+theme: minima
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+header_pages:
+  - index.md
+  - how-it-works.md
+  - use-cases.md
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

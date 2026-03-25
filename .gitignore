@@ -1,3 +1,10 @@
 target/
 .idea/
 result.txt
+
+# Jekyll
+website/_site/
+website/.sass-cache/
+website/.jekyll-cache/
+website/.jekyll-metadata
+website/vendor/
