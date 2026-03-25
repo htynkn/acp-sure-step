@@ -23,13 +23,12 @@ class CoreArchitectureTest {
     void concreteNodeClassesShouldExtendBaseNodeComponent() {
         ArchRule rule = classes()
                 .that().resideInAPackage("..node..")
-                .and().areNotAbstract()
                 .and().haveSimpleNameNotContaining("Test")
                 .should().beAssignableTo(
                         com.huangyunkun.acpsure.core.node.BaseNodeComponent.class)
                 .orShould().beAssignableTo(
                         com.huangyunkun.acpsure.core.node.BaseBooleanNodeComponent.class)
-                .because("All concrete node components must extend BaseNodeComponent or BaseBooleanNodeComponent");
+                .because("All node components must extend BaseNodeComponent or BaseBooleanNodeComponent");
 
         rule.check(importedClasses);
     }
