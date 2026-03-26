@@ -5,12 +5,11 @@ description: >-
 baseurl: "/acp-sure-step"
 url: "https://htynkn.github.io"
 
-remote_theme: poole/lanyon
+theme: minima
 
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
-  - jekyll-remote-theme
 
 exclude:
   - Gemfile
