@@ -1,0 +1,18 @@
+{
+  "tasks": [
+    {
+      "id": "initRepos",
+      "type": "repoWorkspaceInit",
+      "workspace": "/tmp/test-workspace",
+      "repos": [
+        "https://github.com/example/repo1.git",
+        "https://github.com/example/repo2.git"
+      ]
+    },
+    {
+      "id": "listFiles",
+      "type": "bashExec",
+      "bash": "ls ${repoWorkSpace}"
+    }
+  ]
+}

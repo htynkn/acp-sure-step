@@ -8,6 +8,7 @@ import com.huangyunkun.acpsure.core.config.dto.BashExecTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.BashExecConditionTaskConfig;
 import com.huangyunkun.acpsure.core.config.dto.TaskEnum;
 import com.huangyunkun.acpsure.core.config.dto.VariableSetTaskConfig;
+import com.huangyunkun.acpsure.core.config.dto.RepoWorkspaceInitTaskConfig;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 
@@ -109,5 +110,26 @@ class ConfigServiceTest {
         BaseTaskConfig taskConfig2 = taskConfigs.get(1);
         assertThat(taskConfig2, instanceOf(BashExecTaskConfig.class));
         assertThat(taskConfig2.getId(), is("printHello"));
+    }
+
+    @Test
+    void shouldEnableLoadRepoWorkspaceInitTask() throws Exception {
+        ConfigService configService = new ConfigService();
+
+        List<BaseTaskConfig> taskConfigs = configService.loadTask(Resources.getResource("config/repo-workspace-init/task.json").getFile());
+
+        assertThat(taskConfigs, hasSize(2));
+
+        BaseTaskConfig taskConfig1 = taskConfigs.get(0);
+        assertThat(taskConfig1, instanceOf(RepoWorkspaceInitTaskConfig.class));
+        RepoWorkspaceInitTaskConfig repoWorkspaceInitTaskConfig = (RepoWorkspaceInitTaskConfig) taskConfig1;
+        assertThat(repoWorkspaceInitTaskConfig.getId(), is("initRepos"));
+        assertThat(repoWorkspaceInitTaskConfig.getType(), CoreMatchers.is(TaskEnum.repoWorkspaceInit));
+        assertThat(repoWorkspaceInitTaskConfig.getWorkspace(), is("/tmp/test-workspace"));
+        assertThat(repoWorkspaceInitTaskConfig.getRepos(), hasSize(2));
+
+        BaseTaskConfig taskConfig2 = taskConfigs.get(1);
+        assertThat(taskConfig2, instanceOf(BashExecTaskConfig.class));
+        assertThat(taskConfig2.getId(), is("listFiles"));
     }
 }
