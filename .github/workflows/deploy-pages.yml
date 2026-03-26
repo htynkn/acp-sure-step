@@ -5,6 +5,9 @@ on:
     branches: ["master"]
     paths:
       - "website/**"
+  pull_request:
+    paths:
+      - "website/**"
   workflow_dispatch:
 
 permissions:
@@ -48,6 +51,7 @@ jobs:
           path: website/_site
 
   deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
