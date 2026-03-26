@@ -5,5 +5,6 @@ public enum TaskEnum {
     acpExec,
     bashExec,
     bashExecCondition,
-    variableSet
+    variableSet,
+    repoWorkspaceInit
 }

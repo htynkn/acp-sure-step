@@ -61,6 +61,11 @@ public class ConfigService {
                         .setName(taskConfig.getId())
                         .setClazz("com.huangyunkun.acpsure.core.node.VariableSetNode")
                         .build();
+            } else if (taskConfig.getType() == TaskEnum.repoWorkspaceInit) {
+                LiteFlowNodeBuilder.createCommonNode().setId(taskConfig.getId())
+                        .setName(taskConfig.getId())
+                        .setClazz("com.huangyunkun.acpsure.core.node.RepoWorkspaceInitNode")
+                        .build();
             }
         }
 
